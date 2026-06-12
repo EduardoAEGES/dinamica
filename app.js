@@ -96,6 +96,9 @@ const defaultDescriptions = {
 
 // Función para obtener descripciones dinámicas desde Supabase
 async function getAccountDescription(code) {
+  if (code.length === 1) {
+    return getElementoName(code);
+  }
   if (accountCache[code]) {
     return accountCache[code];
   }
@@ -184,19 +187,9 @@ function navigateTo(screenId) {
   const logoIcon = document.getElementById("logo-icon");
   const logoText = document.getElementById("logo-text");
   
-  if (screenId === "op-detail") {
-    backBtn.style.display = "none";
-    logoIcon.style.display = "flex";
-    logoText.textContent = "Operación Contable";
-  } else if (screenId === "pcge") {
-    backBtn.style.display = "none";
-    logoIcon.style.display = "flex";
-    logoText.textContent = "Explorar PCGE";
-  } else {
-    backBtn.style.display = "none";
-    logoIcon.style.display = "flex";
-    logoText.textContent = "DinaConta";
-  }
+  backBtn.style.display = "none";
+  logoIcon.style.display = "flex";
+  logoText.textContent = "DINAMICA CONTABLE 2026 1";
 }
 
 // Configurar clicks de botones de navegación
@@ -1023,7 +1016,7 @@ function renderPcgeBreadcrumbs() {
   // Botón de Inicio (Raíz)
   const homeBtn = document.createElement("button");
   homeBtn.className = `breadcrumb-item ${pcgeExplorerCodePath.length === 0 ? 'active' : ''}`;
-  homeBtn.textContent = "Inicio (2 dígitos)";
+  homeBtn.textContent = "Inicio (Elementos)";
   homeBtn.type = "button";
   homeBtn.onclick = () => {
     pcgeExplorerCodePath = [];
@@ -1066,14 +1059,43 @@ async function explorePcgeLevel(parentCode = "") {
     let queryParams = "";
     
     if (!parentCode) {
-      // Mostrar cuentas raíces de 2 dígitos
-      queryParams = "nivel=eq.2&order=codigo.asc";
-    } else {
-      // Buscar subcuentas directas cuyo código comience con parentCode
-      // y tengan longitud igual a parentCode.length + 1 (ej: de 10 a 101, o de 104 a 1041)
-      const nextLength = parentCode.length + 1;
-      queryParams = `codigo=like.${parentCode}*&nivel=eq.${nextLength}&order=codigo.asc`;
+      // Mostrar los 10 elementos de un solo dígito de manera local e inmediata
+      const elements = [
+        { codigo: "1", descripcion: "Activo Disponible y Exigible" },
+        { codigo: "2", descripcion: "Activo Realizable (Inventarios)" },
+        { codigo: "3", descripcion: "Activo Inmovilizado" },
+        { codigo: "4", descripcion: "Pasivo (Obligaciones)" },
+        { codigo: "5", descripcion: "Patrimonio Neto" },
+        { codigo: "6", descripcion: "Gastos por Naturaleza" },
+        { codigo: "7", descripcion: "Ingresos" },
+        { codigo: "8", descripcion: "Saldos Intermediarios" },
+        { codigo: "9", descripcion: "Costos/Gastos" },
+        { codigo: "0", descripcion: "Cuentas de Orden" }
+      ];
+      
+      countLabel.textContent = elements.length;
+      pcgeList.innerHTML = "";
+      
+      elements.forEach(acc => {
+        const item = document.createElement("button");
+        item.className = "pcge-menu-item element-item";
+        item.onclick = () => {
+          pcgeExplorerCodePath.push(acc.codigo);
+          explorePcgeLevel(acc.codigo);
+        };
+        
+        item.innerHTML = `
+          <span class="pcge-menu-code">Elemento ${acc.codigo}</span>
+          <span class="pcge-menu-desc" title="${acc.descripcion}">${acc.descripcion}</span>
+        `;
+        pcgeList.appendChild(item);
+      });
+      return;
     }
+    
+    // Si hay parentCode (ej: "1" o "10"), consultamos en Supabase
+    const nextLength = parentCode.length + 1;
+    queryParams = `codigo=like.${parentCode}*&nivel=eq.${nextLength}&order=codigo.asc`;
     
     const response = await fetch(`${url}?${queryParams}`, {
       headers: {
@@ -1086,7 +1108,7 @@ async function explorePcgeLevel(parentCode = "") {
       let accounts = await response.json();
       
       // Si el nivel siguiente no arrojó resultados directos pero hay de niveles más profundos
-      if (accounts.length === 0 && parentCode) {
+      if (accounts.length === 0) {
         // Consultar cualquier descendiente de mayor longitud para saltar niveles vacíos
         const fallbackResponse = await fetch(`${url}?codigo=like.${parentCode}*&codigo=neq.${parentCode}&order=codigo.asc&limit=25`, {
           headers: {
@@ -1127,43 +1149,26 @@ async function explorePcgeLevel(parentCode = "") {
       
       // SI HAY RESULTADOS:
       
-      // 1. Agregar tarjeta de información del elemento padre si no estamos en la raíz
-      if (parentCode) {
-        const parentDesc = await getAccountDescription(parentCode);
-        const parentCard = document.createElement("div");
-        parentCard.className = "parent-info-card";
-        parentCard.innerHTML = `
-          <div class="parent-info-title" title="${parentCode} - ${parentDesc}">
-            ${parentCode} - ${parentDesc}
-          </div>
-          <button class="parent-info-btn" type="button">Ver Detalle 📖</button>
-        `;
-        parentCard.querySelector("button").onclick = () => {
-          showBottomSheet({ codigo: parentCode, descripcion: parentDesc, nivel: parentCode.length });
-        };
-        pcgeList.appendChild(parentCard);
-      }
+      // 1. Agregar tarjeta de información del elemento padre
+      const parentDesc = await getAccountDescription(parentCode);
+      const parentCard = document.createElement("div");
+      parentCard.className = "parent-info-card";
+      parentCard.innerHTML = `
+        <div class="parent-info-title" title="${parentCode} - ${parentDesc}">
+          ${parentCode} - ${parentDesc}
+        </div>
+        <button class="parent-info-btn" type="button">Ver Detalle 📖</button>
+      `;
+      parentCard.querySelector("button").onclick = () => {
+        showBottomSheet({ codigo: parentCode, descripcion: parentDesc, nivel: parentCode.length });
+      };
+      pcgeList.appendChild(parentCard);
       
-      // 2. Renderizar los botones (cuadros) de las subcuentas
-      let currentElement = null;
-      
+      // 2. Renderizar los botones de las subcuentas
       accounts.forEach(acc => {
-        // En el nivel raíz de 2 dígitos, insertar títulos de sección de los Elementos
-        if (!parentCode) {
-          const firstChar = acc.codigo.substring(0, 1);
-          if (firstChar !== currentElement) {
-            currentElement = firstChar;
-            const elementHeader = document.createElement("div");
-            elementHeader.className = "element-section-header";
-            elementHeader.textContent = `Elemento ${firstChar}: ${getElementoName(firstChar).toUpperCase()}`;
-            pcgeList.appendChild(elementHeader);
-          }
-        }
-        
         const item = document.createElement("button");
         item.className = "pcge-menu-item";
         item.onclick = () => {
-          // Agregar este código a la ruta de exploración e ir al siguiente nivel
           pcgeExplorerCodePath.push(acc.codigo);
           explorePcgeLevel(acc.codigo);
         };
