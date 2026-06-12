@@ -84,7 +84,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-size: 17px;
+  font-size: 18px;
 }
 
 /* ===== CONTENEDOR ENCUADRE MÓVIL EN WEB ===== */
@@ -582,8 +582,8 @@ header {
 
 .pcge-menu-item {
   display: grid;
-  grid-template-columns: 90px 1fr;
-  padding: 0.75rem 1rem;
+  grid-template-columns: 110px 1fr;
+  padding: 0.9rem 1.15rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -602,11 +602,12 @@ header {
   font-family: var(--font-title);
   font-weight: 700;
   color: var(--primary);
+  font-size: 1.1rem;
 }
 
 .pcge-menu-desc {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -963,7 +964,7 @@ header {
     background: var(--bg-input) !important;
     border: 1px solid var(--border) !important;
     height: 42px !important;
-    font-size: 1.05rem !important;
+    font-size: 1.15rem !important;
     font-weight: 700 !important;
     box-shadow: var(--shadow-sm);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -1041,7 +1042,9 @@ header {
   .pcge-results-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-auto-rows: min-content;
+    align-content: start;
+    gap: 0.85rem;
   }
   
   /* Elementos que deben ocupar todo el ancho en el grid del PCGE */
