@@ -84,6 +84,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  font-size: 17px;
 }
 
 /* ===== CONTENEDOR ENCUADRE MÓVIL EN WEB ===== */
@@ -295,14 +296,14 @@ header {
 
 .op-detail-info h2 {
   font-family: var(--font-title);
-  font-size: 1.35rem;
+  font-size: 1.65rem;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 0.35rem;
 }
 
 .op-detail-info p {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
 }
 
@@ -332,7 +333,7 @@ header {
 }
 
 .input-group label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -346,7 +347,7 @@ header {
   background: var(--bg-input);
   color: var(--text-main);
   outline: none;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
@@ -373,7 +374,7 @@ header {
 }
 
 .summary-col label {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -382,7 +383,7 @@ header {
 .summary-col span {
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -437,7 +438,7 @@ header {
   color: #dc2626; /* Texto rojo bold */
   font-family: var(--font-title);
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -463,7 +464,7 @@ header {
   color: var(--text-main);
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   text-align: center;
   outline: none;
   padding: 0.25rem;
@@ -522,7 +523,7 @@ header {
   color: var(--text-main);
   text-align: left;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   border-radius: 6px;
   cursor: pointer;
   gap: 0.5rem;
@@ -555,7 +556,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -581,7 +582,7 @@ header {
 
 .pcge-menu-item {
   display: grid;
-  grid-template-columns: 70px 1fr;
+  grid-template-columns: 90px 1fr;
   padding: 0.75rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -605,7 +606,7 @@ header {
 
 .pcge-menu-desc {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -667,7 +668,7 @@ header {
   color: var(--primary-hover);
   font-family: var(--font-title);
   font-weight: 800;
-  font-size: 1.6rem;
+  font-size: 1.85rem;
   padding: 0.35rem 1.25rem;
   border-radius: 10px;
   width: max-content;
@@ -683,14 +684,14 @@ header {
 }
 
 .pcge-detail-info label {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .pcge-detail-info span {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 600;
 }
 
@@ -757,7 +758,7 @@ header {
   cursor: pointer;
   font-family: var(--font-title);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   outline: none;
   position: relative;
 }
@@ -962,7 +963,7 @@ header {
     background: var(--bg-input) !important;
     border: 1px solid var(--border) !important;
     height: 42px !important;
-    font-size: 0.9rem !important;
+    font-size: 1.05rem !important;
     font-weight: 700 !important;
     box-shadow: var(--shadow-sm);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
