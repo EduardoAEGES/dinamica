@@ -923,56 +923,134 @@ header {
 
 /* ===== DISEÑO RESPONSIVE Y ADAPTACIÓN DESKTOP ===== */
 @media (min-width: 768px) {
-  /* Ocultar barra de navegación inferior en pantallas grandes */
-  .bottom-nav {
-    display: none !important;
-  }
-  
   /* Cabecera extendida y más limpia */
   header {
     height: 70px;
     padding: 1rem 2.5rem;
+    order: 1;
   }
   
   .logo-section h1 {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
   
-  /* Mostrar contenido en rejilla de dos columnas */
-  .app-content {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
+  /* Sistema de pestañas ordenadas arriba en pantallas grandes */
+  .bottom-nav {
+    position: static !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
     gap: 1.5rem;
-    padding: 1.5rem;
-    height: calc(100vh - 70px);
-    overflow: hidden;
+    height: 60px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: none !important;
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 2rem;
+    box-shadow: var(--shadow-sm);
+    order: 2;
+  }
+  
+  .nav-item {
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem 1.75rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    height: 42px !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  .nav-item:hover {
+    background: var(--primary-light) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+    color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+  }
+  
+  .nav-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+    box-shadow: var(--glow-primary);
+  }
+  
+  .nav-item.active::after {
+    display: none !important;
+  }
+  
+  /* Ajuste de contenedor principal con pestañas arriba */
+  .app-content {
+    order: 3;
+    padding: 2rem;
+    height: calc(100vh - 130px);
+    overflow-y: auto;
     background: var(--bg-app);
   }
   
-  /* Ocultar listado de operaciones en desktop (se va directo al detalle) */
+  /* Ocultar listado de operaciones */
   #screen-op-list {
     display: none !important;
   }
   
-  /* Mostrar las dos columnas de manera paralela */
-  #screen-op-detail, #screen-pcge {
-    display: flex !important;
+  /* Las pantallas ocupan todo el ancho y alto del contenedor, no son absolutas */
+  .screen {
     position: relative !important;
     width: 100% !important;
-    height: 100% !important;
-    opacity: 1 !important;
-    transform: none !important;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.5rem !important;
-    box-shadow: var(--shadow-md);
-    overflow-y: auto;
+    height: auto !important;
+    min-height: 100% !important;
+    padding: 0 !important;
+    overflow-y: visible !important;
+    display: none;
+  }
+  
+  .screen.active {
+    display: flex !important;
+  }
+  
+  /* Centrar contenidos de pantallas en desktop */
+  .op-detail-info,
+  .calc-card,
+  .ledger-view,
+  .pcge-search-wrapper,
+  .pcge-breadcrumbs,
+  .pcge-header-info,
+  .pcge-results-list {
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
+  /* Grid en los inputs de la calculadora en desktop */
+  .calc-inputs-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  /* Grid de 2 columnas en el listado del PCGE en desktop */
+  .pcge-results-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  /* Elementos que deben ocupar todo el ancho en el grid del PCGE */
+  .parent-info-card, .element-section-header {
+    grid-column: span 2;
+  }
+  
   /* Ajustar visualización del ledger y su tabla */
   .ledger-view {
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
   }
   
   /* Estilo de diálogo flotante / Modal centrado en Escritorio para los detalles de cuenta */
@@ -981,9 +1059,9 @@ header {
     top: 50%;
     left: 50%;
     bottom: auto;
-    width: 460px;
+    width: 480px;
     max-width: 90%;
-    border-radius: 20px;
+    border-radius: 24px;
     transform: translate(-50%, -30%) scale(0.95);
     opacity: 0;
     pointer-events: none;
@@ -991,7 +1069,7 @@ header {
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     background: var(--bg-input);
-    padding: 1.5rem;
+    padding: 1.5rem 2rem;
   }
   
   .bottom-sheet.show {
@@ -1007,7 +1085,7 @@ header {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     z-index: 15;
