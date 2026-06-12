@@ -220,9 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearchFilters();
   setupPcgeExplorer();
   
-  // Por defecto ir directamente a la compra de activos inmovilizados
-  selectOperation(6);
-  navigateTo("op-detail");
+  // Por defecto ir directamente al explorador PCGE (Buscador)
+  navigateTo("pcge");
 });
 
 // Selector de Tema Claro/Oscuro
