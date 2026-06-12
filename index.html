@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dinámica Contable - Aplicativo Móvil del PCGE</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Aplicativo móvil web interactivo para buscar asientos contables comunes del PCGE en Perú, calcular importes en tiempo real y explorar la dinámica de cuentas oficiales.">
+  <meta name="keywords" content="contabilidad, PCGE, asientos contables, debe, haber, impuestos, planilla, igv, peru, dinámica contable, app movil">
+  <meta name="author" content="Antigravity Dev">
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- CONTENEDOR ENCUADRE MÓVIL -->
+  <div class="mobile-frame" id="mobile-frame">
+    
+    <!-- CABECERA DE LA APP -->
+    <header id="app-header">
+      <div class="logo-section">
+        <button class="back-btn" id="back-btn" aria-label="Regresar a la pantalla anterior">
+          ←
+        </button>
+        <div class="logo-icon" id="logo-icon">D</div>
+        <h1 id="logo-text">DinaConta</h1>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Cambiar Tema" aria-label="Alternar tema claro/oscuro">
+        🌙
+      </button>
+    </header>
+
+    <!-- ÁREA DE CONTENIDO (PANTALLAS INTERCAMBIABLES) -->
+    <div class="app-content" id="app-content">
+      
+      <!-- PANTALLA 1: LISTA DE OPERACIONES -->
+      <main class="screen active" id="screen-op-list">
+        <div class="search-panel">
+          <div class="input-wrapper">
+            <span class="input-icon">🔍</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Buscar operación contable (ej. compra)..."
+              aria-label="Buscar operación contable por nombre o concepto"
+            >
+          </div>
+        </div>
+        
+        <div class="operations-menu" id="operations-menu">
+          <!-- Cargado dinámicamente desde JS (las 15 operaciones) -->
+        </div>
+      </main>
+
+      <!-- PANTALLA 2: DETALLE DE OPERACIÓN -->
+      <section class="screen" id="screen-op-detail" aria-live="polite">
+        <div class="op-detail-info">
+          <h2 id="op-title">Operación</h2>
+          <p id="op-description">Descripción de la operación contable.</p>
+        </div>
+
+        <!-- Calculadora -->
+        <div class="calc-card">
+          <div class="calc-inputs-list" id="calc-inputs">
+            <!-- Inputs autogenerados por JS -->
+          </div>
+          
+          <div class="calc-horizontal-summary">
+            <div class="summary-col">
+              <label id="sum-label-1">Valor Base</label>
+              <span id="sum-val-1">S/ 0.00</span>
+            </div>
+            <div class="summary-col">
+              <label id="sum-label-2">IGV (18%)</label>
+              <span id="sum-val-2">S/ 0.00</span>
+            </div>
+            <div class="summary-col">
+              <label id="sum-label-3">Total</label>
+              <span class="total" id="sum-val-3">S/ 0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Libro Diario Apilado (Ledger) -->
+        <div class="ledger-view" id="ledger-view">
+          <!-- Asientos de naturaleza/destino generados por JS -->
+        </div>
+      </section>
+
+      <!-- PANTALLA 3: EXPLORADOR PCGE -->
+      <main class="screen" id="screen-pcge">
+        <div class="pcge-search-wrapper">
+          <div class="input-wrapper">
+            <span class="input-icon">🔍</span>
+            <input 
+              type="text" 
+              id="pcge-search-input" 
+              class="search-input" 
+              placeholder="Buscar por código (ej. 10) o nombre..."
+              aria-label="Buscar cuenta contable en el catálogo oficial"
+            >
+          </div>
+        </div>
+
+        <!-- Breadcrumbs para navegación jerárquica -->
+        <div class="pcge-breadcrumbs" id="pcge-breadcrumbs"></div>
+
+        <div class="pcge-header-info">
+          <span>Resultados</span>
+          <span id="pcge-count" style="color: var(--primary);">0</span>
+        </div>
+
+        <div class="pcge-results-list" id="pcge-results-list">
+          <!-- Lista de cuentas del PCGE cargada dinámicamente -->
+        </div>
+
+        <!-- Bottom Sheet para Detalles de la Cuenta -->
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="bottom-sheet" id="pcge-bottom-sheet" role="dialog" aria-labelledby="bs-title">
+          <div class="bottom-sheet-handle" id="bottom-sheet-handle"></div>
+          <div class="bottom-sheet-header">
+            <h3 id="bs-title" style="font-family: var(--font-title); font-size: 1.15rem; font-weight: 700;">Detalle de Cuenta</h3>
+            <button class="bottom-sheet-close" id="bottom-sheet-close" aria-label="Cerrar modal">&times;</button>
+          </div>
+          <div id="pcge-detail-container">
+            <!-- Detalles cargados por JS -->
+          </div>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV) -->
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Menú de navegación inferior">
+      <button class="nav-item active" id="nav-op" data-screen="op-list">
+        <span class="nav-icon">📋</span>
+        <span>Operaciones</span>
+      </button>
+      <button class="nav-item" id="nav-pcge" data-screen="pcge">
+        <span class="nav-icon">🔍</span>
+        <span>Explorar PCGE</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Alerta Toast -->
+  <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
