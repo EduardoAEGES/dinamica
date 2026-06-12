@@ -8,6 +8,9 @@ const accountCache = {};
 // Códigos personalizados ingresados por el usuario
 const userCustomCodes = {};
 
+// Montos personalizados ingresados por el usuario
+const userCustomAmounts = {};
+
 // Descripciones por defecto (fallback inmediato para excelente UX)
 const defaultDescriptions = {
   "10": "EFECTIVO Y EQUIVALENTES DE EFECTIVO",
@@ -123,186 +126,7 @@ async function getAccountDescription(code) {
   return desc;
 }
 
-// ===== ESTRUCTURA DE LAS 15 OPERACIONES =====
 const operations = [
-  {
-    id: 1,
-    name: "Asiento de Apertura",
-    description: "Registro inicial de los activos, pasivos y patrimonio con los que la empresa inicia sus operaciones.",
-    inputTemplate: "apertura",
-    defaultValues: {
-      caja: 6800,
-      mercaderias: 1800,
-      suministros: 150,
-      ctasPagar: 2200,
-      capital: 6150,
-      resultados: 400
-    },
-    calculate: (vals) => {
-      const debeTotal = vals.caja + vals.mercaderias + vals.suministros;
-      const haberTotal = vals.ctasPagar + vals.capital + vals.resultados;
-      return {
-        debeTotal,
-        haberTotal,
-        balanced: debeTotal === haberTotal,
-        entries: [
-          { code: "1041", type: "debe", value: vals.caja, helper: "Efectivo en cuentas corrientes" },
-          { code: "20111", type: "debe", value: vals.mercaderias, helper: "Mercaderías manufacturadas" },
-          { code: "2411", type: "debe", value: vals.suministros, helper: "Materias primas/Suministros" },
-          { code: "4212", type: "haber", value: vals.ctasPagar, helper: "Facturas por pagar" },
-          { code: "5011", type: "haber", value: vals.capital, helper: "Capital social" },
-          { code: "5911", type: "haber", value: vals.resultados, helper: "Utilidades acumuladas" }
-        ]
-      };
-    }
-  },
-  {
-    id: 2,
-    name: "Compra de activos realizables (almacenados)",
-    description: "Compra de mercaderías, materias primas o suministros que ingresan al almacén. Incluye IGV y asiento de destino.",
-    inputTemplate: "compra_almacenada",
-    defaultValues: { valor: 4000, tipo: "materia_prima" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      const igv = valor * 0.18;
-      const precio = valor + igv;
-      
-      let cuentaCompra = "601";
-      let cuentaAlmacen = "20111";
-      let cuentaVariacion = "611";
-      let descCompra = "Compra de mercadería";
-      
-      if (vals.tipo === "materia_prima") {
-        cuentaCompra = "602";
-        cuentaAlmacen = "24111";
-        cuentaVariacion = "6121";
-        descCompra = "Compra de materia prima";
-      } else if (vals.tipo === "suministros") {
-        cuentaCompra = "6033";
-        cuentaAlmacen = "2524";
-        cuentaVariacion = "613";
-        descCompra = "Compra de repuestos/suministros";
-      }
-
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Provisión de la compra)",
-            entries: [
-              { code: cuentaCompra, type: "debe", value: valor, helper: descCompra },
-              { code: "40111", type: "debe", value: igv, helper: "IGV - Cuenta propia (18%)" },
-              { code: "4212", type: "haber", value: precio, helper: "Cuentas por pagar comerciales" }
-            ]
-          },
-          {
-            title: "Asiento de Destino (Ingreso al almacén)",
-            entries: [
-              { code: cuentaAlmacen, type: "debe", value: valor, helper: "Ingreso físico al almacén" },
-              { code: cuentaVariacion, type: "haber", value: valor, helper: "Variación de inventarios" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 3,
-    name: "Consumo o utilización de activos realizables",
-    description: "Salida del almacén de materias primas o suministros para la producción o el área administrativa.",
-    inputTemplate: "consumo_activos",
-    defaultValues: { valor: 3200, area: "produccion" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      let cuentaGasto = "6121";
-      let cuentaAlmacen = "24111";
-      let cuentaDestino = vals.area === "produccion" ? "901" : "941";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Salida del almacén)",
-            entries: [
-              { code: cuentaGasto, type: "debe", value: valor, helper: "Consumo de materias primas" },
-              { code: cuentaAlmacen, type: "haber", value: valor, helper: "Salida de almacén" }
-            ]
-          },
-          {
-            title: "Asiento de Destino (Imputación del costo/gasto)",
-            entries: [
-              { code: cuentaDestino, type: "debe", value: valor, helper: vals.area === "produccion" ? "Costo de producción" : "Gasto administrativo" },
-              { code: "791", type: "haber", value: valor, helper: "Cargas imputables a cuentas de costos" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 4,
-    name: "Compra de activos realizables de consumo inmediato",
-    description: "Suministros de producción, útiles o repuestos de consumo instantáneo sin pasar por almacén. Con destino a gastos.",
-    inputTemplate: "compra_inmediata",
-    defaultValues: { valor: 65, destino: "produccion" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      const igv = valor * 0.18;
-      const precio = valor + igv;
-      let cuentaDestino = vals.destino === "produccion" ? "901" : "941";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza",
-            entries: [
-              { code: "6033", type: "debe", value: valor, helper: "Suministros de consumo inmediato" },
-              { code: "40111", type: "debe", value: igv, helper: "IGV - 18%" },
-              { code: "4212", type: "haber", value: precio, helper: "Facturas por pagar comerciales" }
-            ]
-          },
-          {
-            title: "Asiento de Destino (Transferencia de costos/gastos)",
-            entries: [
-              { code: cuentaDestino, type: "debe", value: valor, helper: vals.destino === "produccion" ? "Costo de producción" : "Gasto administrativo" },
-              { code: "791", type: "haber", value: valor, helper: "Cargas imputables a cuentas de costos" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 5,
-    name: "Operaciones de gastos (Servicios de terceros)",
-    description: "Gastos por consumo de servicios públicos (luz, agua, internet, alquileres) de consumo inmediato.",
-    inputTemplate: "gastos_servicios",
-    defaultValues: { valor: 48, area: "administracion" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      const igv = valor * 0.18;
-      const precio = valor + igv;
-      let cuentaDestino = vals.area === "administracion" ? "941" : "951";
-
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza",
-            entries: [
-              { code: "6361", type: "debe", value: valor, helper: "Gasto de servicios de energía eléctrica" },
-              { code: "40111", type: "debe", value: igv, helper: "IGV - 18%" },
-              { code: "4212", type: "haber", value: precio, helper: "Servicios por pagar - Comerciales" }
-            ]
-          },
-          {
-            title: "Asiento de Destino (Transferencia de gastos)",
-            entries: [
-              { code: cuentaDestino, type: "debe", value: valor, helper: vals.area === "administracion" ? "Gastos Administrativos" : "Gastos de Ventas" },
-              { code: "791", type: "haber", value: valor, helper: "Cargas imputables a gastos" }
-            ]
-          }
-        ]
-      };
-    }
-  },
   {
     id: 6,
     name: "Compra de activos inmovilizados (PPE)",
@@ -322,257 +146,6 @@ const operations = [
               { code: "3XXX", type: "debe", value: valor, helper: "Propiedad, planta y equipo - Costo" },
               { code: "40XX", type: "debe", value: igv, helper: "IGV - Crédito Fiscal" },
               { code: "465X", type: "haber", value: precio, helper: "Cuentas por pagar diversas - Activos" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 7,
-    name: "Operaciones de pago",
-    description: "Egreso de efectivo de cuentas corrientes bancarias para cancelar facturas o deudas pendientes.",
-    inputTemplate: "pago",
-    defaultValues: { valor: 33037.20, tipo: "activo" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      let cuentaDeudora = vals.tipo === "activo" ? "4654" : "4212";
-      let descDeuda = vals.tipo === "activo" ? "Cuentas por pagar diversas" : "Cuentas por pagar comerciales";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Pago (Cancelación de obligación)",
-            entries: [
-              { code: cuentaDeudora, type: "debe", value: valor, helper: descDeuda },
-              { code: "1041", type: "haber", value: valor, helper: "Salida de cuentas corrientes operativas" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 8,
-    name: "Ventas ordinarias",
-    description: "Registro de la venta de bienes o prestación de servicios principales. Genera IGV débito fiscal.",
-    inputTemplate: "venta",
-    defaultValues: { valor: 6000 },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      const igv = valor * 0.18;
-      const total = valor + igv;
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Venta (Ingresos por actividades ordinarias)",
-            entries: [
-              { code: "1212", type: "debe", value: total, helper: "Cuentas por cobrar comerciales - Emitidas" },
-              { code: "40111", type: "haber", value: igv, helper: "IGV - Débito Fiscal (18%)" },
-              { code: "70321", type: "haber", value: valor, helper: "Ingresos por servicios prestados" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 9,
-    name: "Operaciones de cobro",
-    description: "Ingreso de dinero a la caja o cuentas bancarias por cobranza de facturas a clientes.",
-    inputTemplate: "cobro",
-    defaultValues: { valor: 7080, destino: "caja" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      let cuentaIngreso = vals.destino === "caja" ? "101" : "1041";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Cobranza",
-            entries: [
-              { code: cuentaIngreso, type: "debe", value: valor, helper: vals.destino === "caja" ? "Ingreso en Efectivo (Caja)" : "Depósito en Cuentas Corrientes" },
-              { code: "1212", type: "haber", value: valor, helper: "Cancelación de facturas por cobrar" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 10,
-    name: "Costo de ventas",
-    description: "Registro del costo del inventario entregado o servicio prestado, dando de baja el inventario en libros.",
-    inputTemplate: "costo_ventas",
-    defaultValues: { valor: 4800, tipo: "servicio" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      let cuentaCosto = vals.tipo === "mercaderia" ? "6911" : "69321";
-      let cuentaActivo = vals.tipo === "mercaderia" ? "20111" : "21511";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Costo de Ventas",
-            entries: [
-              { code: cuentaCosto, type: "debe", value: valor, helper: vals.tipo === "mercaderia" ? "Costo de venta - mercadería" : "Costo del servicio prestado" },
-              { code: cuentaActivo, type: "haber", value: valor, helper: vals.tipo === "mercaderia" ? "Salida de almacén - Mercaderías" : "Baja de servicios terminados" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 11,
-    name: "Depreciación/Amortización del periodo",
-    description: "Distribución del costo de los activos fijos a lo largo de su vida útil. Con destino a gastos.",
-    inputTemplate: "depreciacion",
-    defaultValues: { valor: 3059, area: "ventas" },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      let cuentaDestino = vals.area === "ventas" ? "951" : "941";
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Depreciación acumulada)",
-            entries: [
-              { code: "682231", type: "debe", value: valor, helper: "Depreciación de vehículos" },
-              { code: "39525", type: "haber", value: valor, helper: "Depreciación acumulada - Vehículos" }
-            ]
-          },
-          {
-            title: "Asiento de Destino (Transferencia al gasto)",
-            entries: [
-              { code: cuentaDestino, type: "debe", value: valor, helper: vals.area === "ventas" ? "Gastos de Ventas" : "Gastos de Administración" },
-              { code: "781", type: "haber", value: valor, helper: "Cargas cubiertas por provisiones" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 12,
-    name: "Estimación de cobranza dudosa",
-    description: "Provisión para posibles pérdidas de clientes morosos que probablemente no paguen sus deudas.",
-    inputTemplate: "cobranza_dudosa",
-    defaultValues: { valor: 450 },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Estimación de cobranza dudosa)",
-            entries: [
-              { code: "68711", type: "debe", value: valor, helper: "Pérdida por estimación de cobranza dudosa" },
-              { code: "1911", type: "haber", value: valor, helper: "Estimación de cobranza dudosa acumulada" }
-            ]
-          },
-          {
-            title: "Asiento de Destino",
-            entries: [
-              { code: "941", type: "debe", value: valor, helper: "Gastos de Administración" },
-              { code: "781", type: "haber", value: valor, helper: "Cargas cubiertas por provisiones" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 13,
-    name: "Desvalorización de existencias",
-    description: "Registro de la pérdida de valor de mercaderías (por obsolescencia, daño o baja de precios).",
-    inputTemplate: "desvalorizacion",
-    defaultValues: { valor: 450 },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Desvalorización de Existencias",
-            entries: [
-              { code: "6951", type: "debe", value: valor, helper: "Gasto por desvalorización de mercaderías" },
-              { code: "29111", type: "haber", value: valor, helper: "Desvalorización de mercaderías acumulada" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 14,
-    name: "Castigo de cuentas estimadas / provisionadas",
-    description: "Eliminación definitiva de libros de una cuenta por cobrar que ya se había catalogado de dudosa.",
-    inputTemplate: "castigo_cuentas",
-    defaultValues: { valor: 450 },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Castigo Comercial",
-            entries: [
-              { code: "1911", type: "debe", value: valor, helper: "Reversión de la provisión de cobranza dudosa" },
-              { code: "1212", type: "haber", value: valor, helper: "Dar de baja definitivamente la factura comercial" }
-            ]
-          }
-        ]
-      };
-    }
-  },
-  {
-    id: 15,
-    name: "Planilla de Remuneraciones",
-    description: "Cálculo y provisión del pago de sueldos al personal, aportes del empleador (Essalud) y retenciones (ONP/AFP).",
-    inputTemplate: "planilla",
-    defaultValues: { sueldoBruto: 1600, regimen: "afp" },
-    calculate: (vals) => {
-      const bruto = vals.sueldoBruto;
-      const essalud = bruto * 0.09;
-      
-      let onp = 0;
-      let afp = 0;
-      
-      if (vals.regimen === "onp") {
-        onp = bruto * 0.13;
-      } else {
-        afp = bruto * 0.1137;
-      }
-      
-      const neto = bruto - onp - afp;
-      
-      const entries = [
-        { code: "6211", type: "debe", value: bruto, helper: "Sueldos y Salarios (Remun. Bruta)" },
-        { code: "6271", type: "debe", value: essalud, helper: "Essalud (9% aporte empleador)" },
-        { code: "4031", type: "haber", value: essalud, helper: "Salud (Essalud por pagar)" }
-      ];
-      
-      if (vals.regimen === "onp") {
-        entries.push({ code: "4032", type: "haber", value: onp, helper: "Sistema Nacional de Pensiones (ONP 13%)" });
-      } else {
-        entries.push({ code: "417", type: "haber", value: afp, helper: "Fondo de Pensiones AFP (11.37%)" });
-      }
-      
-      entries.push({ code: "4111", type: "haber", value: neto, helper: "Remuneraciones netas por pagar" });
-
-      return {
-        blocks: [
-          {
-            title: "Asiento de Planilla de Remuneraciones (Naturaleza)",
-            entries: entries
-          },
-          {
-            title: "Asiento de Destino (Distribución de gastos administrativos 100%)",
-            entries: [
-              { code: "941", type: "debe", value: bruto + essalud, helper: "Gasto de administración de personal" },
-              { code: "791", type: "haber", value: bruto + essalud, helper: "Cargas imputables a gastos de personal" }
             ]
           }
         ]
@@ -612,9 +185,9 @@ function navigateTo(screenId) {
   const logoText = document.getElementById("logo-text");
   
   if (screenId === "op-detail") {
-    backBtn.style.display = "flex";
-    logoIcon.style.display = "none";
-    logoText.textContent = "Detalle";
+    backBtn.style.display = "none";
+    logoIcon.style.display = "flex";
+    logoText.textContent = "Operación Contable";
   } else if (screenId === "pcge") {
     backBtn.style.display = "none";
     logoIcon.style.display = "flex";
@@ -630,12 +203,19 @@ function navigateTo(screenId) {
 function setupNavigation() {
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.addEventListener("click", () => {
-      navigateTo(btn.dataset.screen);
+      const screen = btn.dataset.screen;
+      if (screen === "op-list") {
+        selectOperation(6);
+        navigateTo("op-detail");
+      } else {
+        navigateTo(screen);
+      }
     });
   });
   
   document.getElementById("back-btn").addEventListener("click", () => {
-    navigateTo("op-list");
+    selectOperation(6);
+    navigateTo("op-detail");
   });
 }
 
@@ -647,8 +227,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearchFilters();
   setupPcgeExplorer();
   
-  // Por defecto ir a la lista de operaciones
-  navigateTo("op-list");
+  // Por defecto ir directamente a la compra de activos inmovilizados
+  selectOperation(6);
+  navigateTo("op-detail");
 });
 
 // Selector de Tema Claro/Oscuro
@@ -1196,8 +777,13 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
     
     const tr = document.createElement("tr");
     
-    const debeText = entry.type === "debe" ? getPlaceholderText(code, "debe") : "";
-    const haberText = entry.type === "haber" ? getPlaceholderText(code, "haber") : "";
+    const debeCell = entry.type === "debe" 
+      ? `<input type="text" class="ledger-amount-input" data-op-id="${activeOpId}" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="debe" placeholder="${getPlaceholderText(code, "debe")}" value="${userCustomAmounts[`${activeOpId}_${blockIdx}_${entryIdx}_debe`] || ''}">` 
+      : "";
+      
+    const haberCell = entry.type === "haber" 
+      ? `<input type="text" class="ledger-amount-input" data-op-id="${activeOpId}" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="haber" placeholder="${getPlaceholderText(code, "haber")}" value="${userCustomAmounts[`${activeOpId}_${blockIdx}_${entryIdx}_haber`] || ''}">` 
+      : "";
     
     tr.innerHTML = `
       <td class="center">
@@ -1219,10 +805,10 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
         <span class="desc-official" style="font-size: 0.8rem; font-weight: 500;">${officialDesc}</span>
       </td>
       <td class="center" style="font-size: 0.85rem; font-weight: 700; color: var(--debe);">
-        ${debeText}
+        ${debeCell}
       </td>
       <td class="center" style="font-size: 0.85rem; font-weight: 700; color: var(--haber);">
-        ${haberText}
+        ${haberCell}
       </td>
     `;
     
@@ -1277,7 +863,7 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       debounceTimer = setTimeout(async () => {
         try {
           const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=like.${cleanQuery}*&limit=6&order=codigo.asc`,
+            `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=like.${cleanQuery}*&nivel=eq.${cleanQuery.length + 1}&limit=15&order=codigo.asc`,
             {
               headers: {
                 "apikey": SUPABASE_KEY,
@@ -1330,6 +916,21 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       }
     });
   });
+  
+  // Vincular cambio de montos en Debe/Haber
+  const amountInputs = blockDiv.querySelectorAll(".ledger-amount-input");
+  amountInputs.forEach(input => {
+    input.addEventListener("input", (e) => {
+      const val = e.target.value;
+      const opId = Number(input.dataset.opId);
+      const bIdx = Number(input.dataset.blockIdx);
+      const eIdx = Number(input.dataset.entryIdx);
+      const type = input.dataset.type;
+      
+      const slotKey = `${opId}_${bIdx}_${eIdx}_${type}`;
+      userCustomAmounts[slotKey] = val;
+    });
+  });
 }
 
 // Renderizar las sugerencias flotantes del ledger
@@ -1346,8 +947,8 @@ function renderSuggestions(data, input, suggestionsList, opId, bIdx, eIdx) {
     btn.className = "suggestion-item";
     btn.type = "button";
     btn.innerHTML = `
-      <span class="sugg-code">${item.codigo}</span>
-      <span class="sugg-desc" title="${item.descripcion}">${item.descripcion}</span>
+      <span class="sugg-code" style="font-weight: 700; color: var(--primary); flex-shrink: 0; margin-right: 0.5rem;">${item.codigo}</span>
+      <span class="sugg-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;" title="${item.descripcion}">${item.descripcion}</span>
     `;
     
     btn.addEventListener("mousedown", (e) => {
