@@ -24,8 +24,8 @@
         <button class="back-btn" id="back-btn" aria-label="Regresar a la pantalla anterior">
           ←
         </button>
-        <div class="logo-icon" id="logo-icon">D</div>
-        <h1 id="logo-text">DINAMICA CONTABLE 2026 1</h1>
+        <img src="CERTUS.png" alt="Certus Logo" class="logo-img" id="logo-icon">
+        <h1 id="logo-text">CERTUS CONTAPEDIA</h1>
       </div>
       <button class="theme-toggle" id="theme-toggle" title="Cambiar Tema" aria-label="Alternar tema claro/oscuro">
         🌙
@@ -35,27 +35,341 @@
     <!-- ÁREA DE CONTENIDO (PANTALLAS INTERCAMBIABLES) -->
     <div class="app-content" id="app-content">
       
-      <!-- PANTALLA 1: LISTA DE OPERACIONES -->
-      <main class="screen active" id="screen-op-list">
-        <div class="search-panel">
-          <div class="input-wrapper">
-            <span class="input-icon">🔍</span>
-            <input 
-              type="text" 
-              id="search-input" 
-              class="search-input" 
-              placeholder="Buscar operación contable (ej. compra)..."
-              aria-label="Buscar operación contable por nombre o concepto"
-            >
-          </div>
+      <!-- PANTALLA PRINCIPAL: PORTAL/HUB -->
+      <main class="screen active" id="screen-hub">
+        <div class="hub-hero">
+          <h2>Centro de Aprendizaje Contable</h2>
+          <p>Explora cursos interactivos y herramientas de simulación para dominar la contabilidad.</p>
         </div>
         
-        <div class="operations-menu" id="operations-menu">
-          <!-- Cargado dinámicamente desde JS (las 15 operaciones) -->
+        <div class="courses-grid">
+          <button class="course-card card-dinamica" data-screen="dinamica">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">📊</span>
+            </div>
+            <div class="card-body">
+              <h3>DINAMICA - NIIF</h3>
+              <p>Asientos contables comunes del PCGE y explorador de cuentas oficiales.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
+          
+          <button class="course-card card-costos" data-screen="costos">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">📉</span>
+            </div>
+            <div class="card-body">
+              <h3>GERENCIAL - COSTOS</h3>
+              <p>Análisis de Punto de Equilibrio y Costo-Volumen-Utilidad.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
+          
+          <button class="course-card card-tributacion" data-screen="tributacion">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">⚖️</span>
+            </div>
+            <div class="card-body">
+              <h3>TRIBUTACIÓN - LABORAL</h3>
+              <p>Planilla de sueldos y beneficios en Perú, IGV y detracciones en compras.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
+          
+          <button class="course-card card-auditoria" data-screen="auditoria">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">🔍</span>
+            </div>
+            <div class="card-body">
+              <h3>AUDITORIA - CONTROL INTERNO</h3>
+              <p>Matriz de Riesgos COSO y listas de verificación de procedimientos.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
+          
+          <button class="course-card card-logica" data-screen="logica">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">🧠</span>
+            </div>
+            <div class="card-body">
+              <h3>PENSAMIENTO LOGICO</h3>
+              <p>Generador de Tablas de Verdad paso a paso y desafíos lógicos.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
+          
+          <button class="course-card card-sistemas" data-screen="sistemas">
+            <div class="card-icon-wrapper">
+              <span class="card-icon">💻</span>
+            </div>
+            <div class="card-body">
+              <h3>SISTEMAS CONTABLES</h3>
+              <p>Simulador de voucher diario y generación de Balance de Comprobación.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </button>
         </div>
       </main>
 
-      <!-- PANTALLA 2: DETALLE DE OPERACIÓN -->
+      <!-- PANTALLA DE DINAMICA CONTABLE -->
+      <main class="screen" id="screen-dinamica">
+        
+        <div class="sub-panels-wrapper" style="height: 100%;">
+          
+          <!-- PANEL PRINCIPAL (HUB DE DINÁMICA) -->
+          <div class="sub-panel active" id="panel-dinamica-hub" style="overflow-y: auto; padding: 0.85rem 1rem;">
+            
+            <!-- Botones superiores -->
+            <div class="dinamica-hub-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+              <button class="dinamica-hub-btn" id="btn-to-catalogo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">📖</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Catálogo de Cuentas</span>
+              </button>
+              <button class="dinamica-hub-btn" id="btn-to-asientos" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">📋</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Asientos más Comunes</span>
+              </button>
+            </div>
+
+            <!-- Tabla de Resumen de Elementos (Segunda Imagen) -->
+            <div class="summary-table-container" style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-card); margin-bottom: 0.85rem; box-shadow: var(--shadow-sm);">
+              <table class="elements-summary-table" style="width: 100%; border-collapse: collapse; font-size: 0.68rem; text-align: left;">
+                <thead>
+                  <tr style="background: #1e1b4b; color: white; text-align: center; font-weight: 700;">
+                    <th style="padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); width: 45px;">Elem.</th>
+                    <th style="padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); text-align: left;">Denominación</th>
+                    <th style="padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); width: 42px; text-align: center;">Debe</th>
+                    <th style="padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); width: 42px; text-align: center;">Haber</th>
+                    <th style="padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); text-align: left;">Excepciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">1</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Activo disponible y exigible</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">122, 132, 19</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">2</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Activo realizable</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">29</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">3</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Activo inmovilizado</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">39</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">4</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Pasivo</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">4011(c), 422, 432</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">5</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Patrimonio</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">592</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">6</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Gasto</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">61 (compra)</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">7</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Ingreso</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">74</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">8</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600; color: var(--text-muted);">Saldos Intermedios de gestión</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: var(--border);"></td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: var(--border);"></td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">-</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">9</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600;">Cuentas analíticas de explotación</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #22c55e; color: white; font-weight: 800;">(+)</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: #ef4444; color: white; font-weight: 800;">(-)</td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">-</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 800; text-align: center; color: var(--primary);">0</td>
+                    <td style="padding: 0.35rem 0.4rem; font-weight: 600; color: var(--text-muted);">Cuentas de orden</td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: var(--border);"></td>
+                    <td style="padding: 0.35rem 0.4rem; text-align: center; background: var(--border);"></td>
+                    <td style="padding: 0.35rem 0.4rem; color: var(--text-muted); font-size: 0.62rem;">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Botones inferiores -->
+            <div class="dinamica-hub-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <button class="dinamica-hub-btn" id="btn-to-plan" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">⚙️</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Dinámica del Plan</span>
+              </button>
+              <button class="dinamica-hub-btn" id="btn-to-generalidades" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">💡</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Generalidades NIIF</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- PANEL: ASIENTOS COMUNES -->
+          <div class="sub-panel" id="panel-asientos" style="height: 100%;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; background: var(--glass-bg);">
+              <button class="btn-back-to-dinamica-hub" style="background: none; border: none; color: var(--primary); font-weight: 700; font-size: 0.85rem; cursor: pointer;">← Regresar</button>
+              <span style="font-size: 0.85rem; font-weight: 700; font-family: var(--font-title);">Asientos más Comunes</span>
+            </div>
+            
+            <div class="search-panel" style="padding: 0.75rem 1rem;">
+              <div class="input-wrapper">
+                <span class="input-icon">🔍</span>
+                <input 
+                  type="text" 
+                  id="search-input" 
+                  class="search-input" 
+                  placeholder="Buscar operación contable (ej. compra)..."
+                  aria-label="Buscar operación contable por nombre o concepto"
+                >
+              </div>
+            </div>
+            
+            <div class="operations-menu" id="operations-menu" style="height: calc(100% - 110px); overflow-y: auto;">
+              <!-- Cargado dinámicamente desde JS -->
+            </div>
+          </div>
+
+          <!-- PANEL: CATÁLOGO DE CUENTAS (EX-BUSCADOR PCGE) -->
+          <div class="sub-panel" id="panel-catalogo" style="height: 100%;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; background: var(--glass-bg);">
+              <button class="btn-back-to-dinamica-hub" style="background: none; border: none; color: var(--primary); font-weight: 700; font-size: 0.85rem; cursor: pointer;">← Regresar</button>
+              <span style="font-size: 0.85rem; font-weight: 700; font-family: var(--font-title);">Catálogo de Cuentas PCGE</span>
+            </div>
+
+            <div class="pcge-search-wrapper" style="padding: 0.75rem 1rem 0.5rem 1rem;">
+              <div class="input-wrapper">
+                <span class="input-icon">🔍</span>
+                <input 
+                  type="text" 
+                  id="pcge-search-input" 
+                  class="search-input" 
+                  placeholder="Buscar por código (ej. 10) o nombre..."
+                  aria-label="Buscar cuenta contable en el catálogo oficial"
+                >
+              </div>
+            </div>
+
+            <!-- Breadcrumbs para navegación jerárquica -->
+            <div class="pcge-breadcrumbs" id="pcge-breadcrumbs" style="padding: 0.25rem 1rem;"></div>
+
+            <div class="pcge-header-info" style="padding: 0.25rem 1rem;">
+              <span>Resultados</span>
+              <span id="pcge-count" style="color: var(--primary);">0</span>
+            </div>
+
+            <div class="pcge-results-list" id="pcge-results-list" style="height: calc(100% - 145px); overflow-y: auto; padding: 0 1rem 1rem 1rem;">
+              <!-- Lista de cuentas del PCGE cargada dinámicamente -->
+            </div>
+
+            <!-- Bottom Sheet para Detalles de la Cuenta -->
+            <div class="modal-backdrop" id="modal-backdrop"></div>
+            <div class="bottom-sheet" id="pcge-bottom-sheet" role="dialog" aria-labelledby="bs-title">
+              <div class="bottom-sheet-handle" id="bottom-sheet-handle"></div>
+              <div class="bottom-sheet-header">
+                <h3 id="bs-title" style="font-family: var(--font-title); font-size: 1.15rem; font-weight: 700;">Detalle de Cuenta</h3>
+                <button class="bottom-sheet-close" id="bottom-sheet-close" aria-label="Cerrar modal">&times;</button>
+              </div>
+              <div id="pcge-detail-container">
+                <!-- Detalles cargados por JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL: DINÁMICA DEL PLAN DE CUENTAS (EXPLICATIVO) -->
+          <div class="sub-panel" id="panel-dinamica-plan" style="height: 100%;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; background: var(--glass-bg);">
+              <button class="btn-back-to-dinamica-hub" style="background: none; border: none; color: var(--primary); font-weight: 700; font-size: 0.85rem; cursor: pointer;">← Regresar</button>
+              <span style="font-size: 0.85rem; font-weight: 700; font-family: var(--font-title);">Dinámica del Plan</span>
+            </div>
+            
+            <div class="course-content-scroll" style="padding: 1rem; overflow-y: auto; height: calc(100% - 45px);">
+              <div class="calc-card" style="margin-bottom:0.75rem;">
+                <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:0.4rem;">Reglas de la Dinámica Contable</h3>
+                <p style="font-size:0.78rem; line-height:1.45; color:var(--text-muted);">
+                  El Plan Contable General Empresarial (PCGE) se estructura bajo la teoría del Cargo y el Abono (partida doble):
+                </p>
+                <ul style="font-size:0.76rem; color:var(--text-muted); margin-left:1rem; margin-top:0.4rem; line-height:1.4;">
+                  <li><strong>Activos (1, 2, 3) / Gastos (6, 9)</strong>: Aumentan por el <strong>Debe</strong> (+) y disminuyen por el <strong>Haber</strong> (-).</li>
+                  <li><strong>Pasivos (4) / Patrimonio (5) / Ingresos (7)</strong>: Aumentan por el <strong>Haber</strong> (+) y disminuyen por el <strong>Debe</strong> (-).</li>
+                </ul>
+              </div>
+
+              <div class="calc-card" style="margin-bottom:0.75rem;">
+                <h3 style="font-size:0.9rem; margin-bottom:0.4rem;">Estructura del PCGE</h3>
+                <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.75rem;">
+                  <div style="border-bottom:1px dashed var(--border); padding-bottom:0.25rem;"><strong>Elemento (1 dígito)</strong>: Clasificación general (ej. 1: Activos corrientes).</div>
+                  <div style="border-bottom:1px dashed var(--border); padding-bottom:0.25rem;"><strong>Cuenta (2 dígitos)</strong>: Rubro contable (ej. 10: Efectivo).</div>
+                  <div style="border-bottom:1px dashed var(--border); padding-bottom:0.25rem;"><strong>Subcuenta (3 dígitos)</strong>: Detalle operativo (ej. 104: Ctas Corrientes).</div>
+                  <div><strong>Divisionaria / Subdiv. (4 o 5 dígitos)</strong>: Auxiliar contable para registrar bancos u operaciones específicas.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL: GENERALIDADES NIIF -->
+          <div class="sub-panel" id="panel-generalidades" style="height: 100%;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; background: var(--glass-bg);">
+              <button class="btn-back-to-dinamica-hub" style="background: none; border: none; color: var(--primary); font-weight: 700; font-size: 0.85rem; cursor: pointer;">← Regresar</button>
+              <span style="font-size: 0.85rem; font-weight: 700; font-family: var(--font-title);">Generalidades NIIF</span>
+            </div>
+            
+            <div class="course-content-scroll" style="padding: 1rem; overflow-y: auto; height: calc(100% - 45px);">
+              <div class="calc-card" style="margin-bottom:0.75rem;">
+                <h3 style="color:var(--debe); font-size:0.95rem; margin-bottom:0.4rem;">Marco Conceptual de las NIIF</h3>
+                <p style="font-size:0.78rem; line-height:1.45; color:var(--text-muted);">
+                  Las Normas Internacionales de Información Financiera (NIIF o IFRS) establecen los requisitos de reconocimiento, medición, presentación y revelación de las transacciones económicas:
+                </p>
+                <div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.4rem; font-size:0.76rem;">
+                  <p><strong>1. Devengado</strong>: Los efectos de las transacciones se reconocen cuando ocurren (no cuando se cobra o paga).</p>
+                  <p><strong>2. Empresa en Marcha</strong>: La entidad se proyecta a continuar operaciones en el futuro previsible.</p>
+                  <p><strong>3. Relevancia y Representación Fiel</strong>: Características cualitativas fundamentales para que la información financiera sea útil en la toma de decisiones.</p>
+                </div>
+              </div>
+
+              <div class="calc-card">
+                <h3 style="font-size:0.9rem; margin-bottom:0.4rem;">Los Estados Financieros Clave</h3>
+                <ul style="font-size:0.75rem; color:var(--text-muted); margin-left:1rem; line-height:1.45;">
+                  <li><strong>Estado de Situación Financiera</strong>: Activos, Pasivos y Patrimonio (Elemento 1 al 5).</li>
+                  <li><strong>Estado de Resultados</strong>: Ingresos y Gastos (Elemento 6 y 7).</li>
+                  <li><strong>Estado de Cambios en el Patrimonio</strong>: Evolución del capital neto.</li>
+                  <li><strong>Estado de Flujos de Efectivo</strong>: Origen y aplicación del dinero (actividades de operación, inversión y financiamiento).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- PANTALLA DETALLE DE OPERACIÓN -->
       <section class="screen" id="screen-op-detail" aria-live="polite">
         <div class="op-detail-info">
           <h2 id="op-title">Operación</h2>
@@ -90,43 +404,433 @@
         </div>
       </section>
 
-      <!-- PANTALLA 3: EXPLORADOR PCGE -->
-      <main class="screen" id="screen-pcge">
-        <div class="pcge-search-wrapper">
-          <div class="input-wrapper">
-            <span class="input-icon">🔍</span>
-            <input 
-              type="text" 
-              id="pcge-search-input" 
-              class="search-input" 
-              placeholder="Buscar por código (ej. 10) o nombre..."
-              aria-label="Buscar cuenta contable en el catálogo oficial"
-            >
+      <!-- PANTALLA: GERENCIAL - COSTOS -->
+      <main class="screen" id="screen-costos">
+        <div class="course-header-desc">
+          <h2>Gerencial - Costos</h2>
+          <p>Aprende a analizar costos y a determinar el Punto de Equilibrio para la toma de decisiones.</p>
+        </div>
+        
+        <div class="course-content-scroll">
+          <div class="calc-card">
+            <h3>Calculadora de Punto de Equilibrio</h3>
+            
+            <div class="input-group">
+              <label for="costos-fijos">Costos Fijos Totales (S/.)</label>
+              <input type="number" id="costos-fijos" value="6000" min="0" step="100">
+            </div>
+            <div class="input-group">
+              <label for="precio-unitario">Precio de Venta Unitario (S/.)</label>
+              <input type="number" id="precio-unitario" value="50" min="1" step="1">
+            </div>
+            <div class="input-group">
+              <label for="costo-variable">Costo Variable Unitario (S/.)</label>
+              <input type="number" id="costo-variable" value="30" min="0" step="1">
+            </div>
+            
+            <button class="btn-primary" id="btn-calc-costos" style="width:100%; margin-top:0.75rem;">Calcular Punto de Equilibrio</button>
+          </div>
+          
+          <div class="results-card" id="costos-results" style="display:none;">
+            <h3>Resultados del Análisis CVP</h3>
+            <div class="result-row">
+              <span>Margen de Contribución Unitario (MCU):</span>
+              <strong id="res-mcu">S/ 20.00</strong>
+            </div>
+            <div class="result-row">
+              <span>Margen de Contribución (%):</span>
+              <strong id="res-mcu-pct">40.00%</strong>
+            </div>
+            <div class="result-row">
+              <span>Punto de Equilibrio (Q en Unidades):</span>
+              <strong id="res-pe-unidades" class="text-primary">300 Unidades</strong>
+            </div>
+            <div class="result-row">
+              <span>Punto de Equilibrio (Ventas en Soles):</span>
+              <strong id="res-pe-soles">S/ 15,000.00</strong>
+            </div>
+            
+            <div class="progress-bar-container" style="margin-top: 1rem;">
+              <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.25rem; display:block;">Estructura del Precio de Venta:</label>
+              <div class="progress-bar" style="display:flex; height:24px; border-radius:6px; overflow:hidden; font-size:0.75rem; font-weight:700; color:white; text-align:center; line-height:24px;">
+                <div class="progress-segment" id="bar-cvu" style="background:#f43f5e; width: 60%;">CVU: 60%</div>
+                <div class="progress-segment" id="bar-mcu" style="background:#10b981; width: 40%;">MCU: 40%</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="theory-card">
+            <h3>Fórmulas Contables Utilizadas</h3>
+            <div class="formula-box">
+              <p class="formula-title"><strong>Punto de Equilibrio (Q)</strong></p>
+              <p class="formula-math">\(Q = \frac{\text{Costos Fijos}}{\text{Precio} - \text{Costo Variable Unitario}}\)</p>
+              <p style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-muted);">Define el volumen de ventas donde las utilidades netas son exactamente cero (la empresa no gana ni pierde).</p>
+            </div>
           </div>
         </div>
+      </main>
 
-        <!-- Breadcrumbs para navegación jerárquica -->
-        <div class="pcge-breadcrumbs" id="pcge-breadcrumbs"></div>
-
-        <div class="pcge-header-info">
-          <span>Resultados</span>
-          <span id="pcge-count" style="color: var(--primary);">0</span>
-        </div>
-
-        <div class="pcge-results-list" id="pcge-results-list">
-          <!-- Lista de cuentas del PCGE cargada dinámicamente -->
-        </div>
-
-        <!-- Bottom Sheet para Detalles de la Cuenta -->
-        <div class="modal-backdrop" id="modal-backdrop"></div>
-        <div class="bottom-sheet" id="pcge-bottom-sheet" role="dialog" aria-labelledby="bs-title">
-          <div class="bottom-sheet-handle" id="bottom-sheet-handle"></div>
-          <div class="bottom-sheet-header">
-            <h3 id="bs-title" style="font-family: var(--font-title); font-size: 1.15rem; font-weight: 700;">Detalle de Cuenta</h3>
-            <button class="bottom-sheet-close" id="bottom-sheet-close" aria-label="Cerrar modal">&times;</button>
+      <!-- PANTALLA: TRIBUTACIÓN - LABORAL -->
+      <main class="screen" id="screen-tributacion">
+        <div class="sub-tabs-container">
+          <div class="sub-tabs">
+            <button class="sub-tab-btn active" id="tab-trib-laboral" data-panel="panel-laboral">Planilla Laboral</button>
+            <button class="sub-tab-btn" id="tab-trib-impuestos" data-panel="panel-impuestos">IGV y Detracciones</button>
           </div>
-          <div id="pcge-detail-container">
-            <!-- Detalles cargados por JS -->
+        </div>
+        
+        <div class="sub-panels-wrapper">
+          <!-- Panel Planilla Laboral -->
+          <div class="sub-panel active" id="panel-laboral">
+            <div class="course-content-scroll">
+              <div class="calc-card">
+                <h3>Cálculo de Sueldo (Régimen General)</h3>
+                
+                <div class="input-group">
+                  <label for="sueldo-basico">Sueldo Básico Mensual (S/.)</label>
+                  <input type="number" id="sueldo-basico" value="1200" min="1025" step="50">
+                </div>
+                <div class="input-group-checkbox" style="display:flex; align-items:center; gap:0.5rem; margin:0.75rem 0;">
+                  <input type="checkbox" id="asig-familiar" checked style="width:18px; height:18px; cursor:pointer;">
+                  <label for="asig-familiar" style="font-size:0.85rem; cursor:pointer;">Asignación Familiar (+S/ 102.50)</label>
+                </div>
+                <div class="input-group">
+                  <label for="regimen-pension">Sistema de Pensiones (Retención)</label>
+                  <select id="regimen-pension" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
+                    <option value="onp">ONP (13.00%)</option>
+                    <option value="afp-integra">AFP Integra (12.80% prom.)</option>
+                    <option value="afp-prima">AFP Prima (12.90% prom.)</option>
+                    <option value="afp-profuturo">AFP Profuturo (13.00% prom.)</option>
+                  </select>
+                </div>
+                
+                <button class="btn-primary" id="btn-calc-planilla" style="width:100%; margin-top:0.75rem;">Calcular Planilla y Provisiones</button>
+              </div>
+              
+              <div class="results-card" id="planilla-results" style="display:none;">
+                <h3>Simulador de Boleta de Pago</h3>
+                
+                <div class="boleta-table" style="font-size:0.8rem; display:flex; flex-direction:column; gap:0.5rem;">
+                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <h4 style="color:var(--primary); font-weight:700; margin-bottom:0.25rem;">1. INGRESOS TRABAJADOR</h4>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Sueldo Básico:</span><span id="bol-basico">S/ 0.00</span></div>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Asig. Familiar:</span><span id="bol-asig">S/ 0.00</span></div>
+                    <div class="boleta-row font-bold" style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed var(--border); margin-top:0.25rem; padding-top:0.25rem;"><span>Remuneración Computable:</span><span id="bol-total-rem">S/ 0.00</span></div>
+                  </div>
+                  
+                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <h4 style="color:var(--haber); font-weight:700; margin-bottom:0.25rem;">2. DESCUENTOS AL TRABAJADOR</h4>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Pensión (<span id="bol-pension-lbl">ONP</span>):</span><span id="bol-pension-val" style="color:var(--haber);">-S/ 0.00</span></div>
+                    <div class="boleta-row font-bold" style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed var(--border); margin-top:0.25rem; padding-top:0.25rem;"><span>Sueldo Neto a Recibir:</span><span id="bol-neto" style="color:var(--debe);">S/ 0.00</span></div>
+                  </div>
+                  
+                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <h4 style="color:var(--text-main); font-weight:700; margin-bottom:0.25rem;">3. APORTES EMPLEADOR</h4>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>EsSalud (9%):</span><span id="bol-essalud">S/ 0.00</span></div>
+                  </div>
+                  
+                  <div class="boleta-section">
+                    <h4 style="color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">4. PROVISIONES MENSUALES</h4>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Gratificaciones (16.67%):</span><span id="bol-grati">S/ 0.00</span></div>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>CTS (9.72% apr.):</span><span id="bol-cts">S/ 0.00</span></div>
+                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Vacaciones (8.33%):</span><span id="bol-vacaciones">S/ 0.00</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Panel IGV y Detracciones -->
+          <div class="sub-panel" id="panel-impuestos">
+            <div class="course-content-scroll">
+              <div class="calc-card">
+                <h3>Cálculo de IGV y Detracción</h3>
+                
+                <div class="input-group">
+                  <label for="monto-operacion">Monto Ingresado (S/.)</label>
+                  <input type="number" id="monto-operacion" value="1000" min="0" step="50">
+                </div>
+                <div class="input-group">
+                  <label for="tipo-monto">Tipo de Monto:</label>
+                  <select id="tipo-monto" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
+                    <option value="base">Valor Venta (No incluye IGV)</option>
+                    <option value="total">Precio Venta (Incluye IGV 18%)</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label for="tasa-detraccion">Tasa de Detracción SUNAT:</label>
+                  <select id="tasa-detraccion" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
+                    <option value="0">Sin detracción</option>
+                    <option value="0.10">Servicios Empresariales (10%)</option>
+                    <option value="0.12">Servicios de Limpieza / Seguridad (12%)</option>
+                    <option value="0.04">Transporte de Bienes (4%)</option>
+                    <option value="0.09">Arrendamiento de Bienes (9%)</option>
+                  </select>
+                </div>
+                
+                <button class="btn-primary" id="btn-calc-tributos" style="width:100%; margin-top:0.75rem;">Calcular Liquidación</button>
+              </div>
+              
+              <div class="results-card" id="tributos-results" style="display:none;">
+                <h3>Liquidación de Operación</h3>
+                <div class="result-row">
+                  <span>Valor Base (Subtotal):</span>
+                  <strong id="trib-base">S/ 0.00</strong>
+                </div>
+                <div class="result-row">
+                  <span>IGV (18%):</span>
+                  <strong id="trib-igv">S/ 0.00</strong>
+                </div>
+                <div class="result-row font-bold" style="border-bottom: 1px solid var(--border); padding-bottom:0.5rem;">
+                  <span>Precio de Venta Total:</span>
+                  <strong id="trib-total">S/ 0.00</strong>
+                </div>
+                <div class="result-row" style="margin-top:0.5rem;">
+                  <span>Depósito Detracción (<span id="trib-det-pct">0%</span>):</span>
+                  <strong id="trib-det-val" style="color:var(--haber);">S/ 0.00</strong>
+                </div>
+                <div class="result-row font-bold">
+                  <span>Neto a Pagar al Proveedor:</span>
+                  <strong id="trib-neto-pagar" style="color:var(--debe);">S/ 0.00</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- PANTALLA: AUDITORIA - CONTROL INTERNO -->
+      <main class="screen" id="screen-auditoria">
+        <div class="sub-tabs-container">
+          <div class="sub-tabs">
+            <button class="sub-tab-btn active" id="tab-aud-riesgos" data-panel="panel-riesgos">Matriz de Riesgos (COSO)</button>
+            <button class="sub-tab-btn" id="tab-aud-programa" data-panel="panel-programa">Programa de Auditoría</button>
+          </div>
+        </div>
+        
+        <div class="sub-panels-wrapper">
+          <!-- Panel Riesgos -->
+          <div class="sub-panel active" id="panel-riesgos">
+            <div class="search-panel" style="padding:0.75rem 1rem;">
+              <select id="select-area-riesgo" class="search-input" style="padding: 0.5rem; height: auto; font-size:0.9rem;">
+                <option value="todos">Todas las Áreas de Riesgo</option>
+                <option value="caja">Efectivo y Equivalentes de Efectivo</option>
+                <option value="inventarios">Inventarios y Almacenes</option>
+                <option value="cobrar">Cuentas por Cobrar y Ventas</option>
+                <option value="compras">Compras y Cuentas por Pagar</option>
+              </select>
+            </div>
+            
+            <div class="course-content-scroll" style="height: calc(100% - 60px);">
+              <div class="risk-matrix-list" id="risk-matrix-list" style="display:flex; flex-direction:column; gap:0.75rem; padding:0 1rem 1rem 1rem;">
+                <!-- Cargado dinámicamente desde JS -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- Panel Programa de Auditoría -->
+          <div class="sub-panel" id="panel-programa">
+            <div class="course-content-scroll">
+              <div class="calc-card" style="padding: 0.75rem 1rem;">
+                <h3 style="margin-bottom:0.5rem;">Generador de Procedimientos</h3>
+                <div class="audit-btn-group" style="display:flex; gap:0.4rem;">
+                  <button class="btn-audit-select active" data-audit="efectivo" style="flex:1; padding:0.4rem; font-size:0.75rem; font-weight:700; border-radius:6px; cursor:pointer; background:var(--primary); color:white; border:none;">Efectivo</button>
+                  <button class="btn-audit-select" data-audit="ventas" style="flex:1; padding:0.4rem; font-size:0.75rem; font-weight:700; border-radius:6px; cursor:pointer; background:var(--border); color:var(--text-main); border:none;">Ventas / Cobrar</button>
+                  <button class="btn-audit-select" data-audit="inventarios" style="flex:1; padding:0.4rem; font-size:0.75rem; font-weight:700; border-radius:6px; cursor:pointer; background:var(--border); color:var(--text-main); border:none;">Inventarios</button>
+                </div>
+              </div>
+              
+              <div class="results-card" style="margin-top:0.75rem;">
+                <h3 id="audit-title-text" style="font-size:1rem; border-bottom:1px solid var(--border); padding-bottom:0.25rem;">Procedimientos de Auditoría</h3>
+                <div class="checklist-container" id="audit-checklist" style="display:flex; flex-direction:column; gap:0.6rem; margin-top:0.75rem;">
+                  <!-- Checkboxes de auditoría cargados por JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- PANTALLA: PENSAMIENTO LOGICO -->
+      <main class="screen" id="screen-logica">
+        <div class="sub-tabs-container">
+          <div class="sub-tabs">
+            <button class="sub-tab-btn active" id="tab-log-tablas" data-panel="panel-tablas">Tablas de Verdad</button>
+            <button class="sub-tab-btn" id="tab-log-acertijos" data-panel="panel-acertijos">Desafíos Lógicos</button>
+          </div>
+        </div>
+        
+        <div class="sub-panels-wrapper">
+          <!-- Panel Tablas de Verdad -->
+          <div class="sub-panel active" id="panel-tablas">
+            <div class="course-content-scroll">
+              <div class="calc-card">
+                <h3>Generar Tabla de Verdad</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom: 0.5rem;">Arma tu fórmula lógica con las proposiciones p y q y evalúa su validez:</p>
+                
+                <div class="logic-ops-row" style="display:flex; gap:0.25rem; margin-bottom:0.75rem;">
+                  <button class="btn-op-logic" data-op="∧" style="flex:1; padding:0.35rem; font-size:0.75rem; font-weight:700; border-radius:4px; border:1px solid var(--border); cursor:pointer; background:var(--bg-input); color:var(--text-main);">Conj (∧)</button>
+                  <button class="btn-op-logic" data-op="∨" style="flex:1; padding:0.35rem; font-size:0.75rem; font-weight:700; border-radius:4px; border:1px solid var(--border); cursor:pointer; background:var(--bg-input); color:var(--text-main);">Disy (∨)</button>
+                  <button class="btn-op-logic" data-op="→" style="flex:1; padding:0.35rem; font-size:0.75rem; font-weight:700; border-radius:4px; border:1px solid var(--border); cursor:pointer; background:var(--bg-input); color:var(--text-main);">Cond (→)</button>
+                  <button class="btn-op-logic" data-op="↔" style="flex:1; padding:0.35rem; font-size:0.75rem; font-weight:700; border-radius:4px; border:1px solid var(--border); cursor:pointer; background:var(--bg-input); color:var(--text-main);">Bicond (↔)</button>
+                  <button class="btn-op-logic" data-op="~" style="flex:1; padding:0.35rem; font-size:0.75rem; font-weight:700; border-radius:4px; border:1px solid var(--border); cursor:pointer; background:var(--bg-input); color:var(--text-main);">Neg (~)</button>
+                </div>
+                
+                <div class="input-group">
+                  <label for="logic-expr">Fórmula a Evaluar:</label>
+                  <input type="text" id="logic-expr" value="p → q" readonly class="search-input" style="text-align: center; font-weight: 700; font-size: 1.15rem; background: var(--bg-input); border:1px solid var(--border);">
+                </div>
+                
+                <div class="button-group-row" style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+                  <button class="btn-primary" id="btn-generate-table" style="flex:2;">Generar Tabla</button>
+                  <button class="btn-secondary" id="btn-clear-logic" style="flex:1;">Limpiar</button>
+                </div>
+              </div>
+              
+              <div class="results-card" id="logic-table-results" style="display:none; overflow-x: auto; margin-top:0.75rem;">
+                <table class="truth-table" id="truth-table-el" style="width:100%; border-collapse:collapse; text-align:center; font-size:0.8rem;">
+                  <!-- Cabecera y cuerpo generados dinámicamente -->
+                </table>
+                <p style="font-size:0.8rem; text-align:center; margin-top:0.5rem; font-weight:700; color:var(--primary);" id="logic-classification-text"></p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Panel Desafíos Lógicos -->
+          <div class="sub-panel" id="panel-acertijos">
+            <div class="course-content-scroll">
+              <div class="challenge-card" id="challenge-card" style="padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom:1rem;">
+                <div class="challenge-num" style="display:inline-block; padding:0.2rem 0.5rem; background:var(--primary-light); color:var(--primary); font-size:0.75rem; font-weight:800; border-radius:4px; margin-bottom:0.5rem;" id="challenge-num-lbl">Desafío #1</div>
+                <h3 id="challenge-question" style="font-size:1.05rem; font-family:var(--font-title); font-weight:700; line-height:1.25;">¿Cuál es el saldo final de la cuenta de efectivo?</h3>
+                <p id="challenge-body" style="font-size:0.85rem; margin-top:0.5rem; margin-bottom:1rem; line-height: 1.4; color:var(--text-muted);"></p>
+                
+                <div class="challenge-options" id="challenge-options" style="display:flex; flex-direction:column; gap:0.5rem;">
+                  <!-- Botones de opción -->
+                </div>
+                
+                <div id="challenge-feedback" style="display:none; margin-top:1rem; padding:0.75rem; border-radius:8px; font-size:0.8rem; font-weight:700;"></div>
+                <button class="btn-primary" id="btn-next-challenge" style="display:none; width:100%; margin-top:1rem;">Siguiente Desafío →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- PANTALLA: SISTEMAS CONTABLES -->
+      <main class="screen" id="screen-sistemas">
+        <div class="sub-tabs-container">
+          <div class="sub-tabs">
+            <button class="sub-tab-btn active" id="tab-sis-voucher" data-panel="panel-voucher">Registro de Voucher</button>
+            <button class="sub-tab-btn" id="tab-sis-balance" data-panel="panel-balance">Balance de Comprobación</button>
+          </div>
+        </div>
+        
+        <div class="sub-panels-wrapper">
+          <!-- Panel Registro de Voucher -->
+          <div class="sub-panel active" id="panel-voucher">
+            <div class="course-content-scroll">
+              <div class="calc-card" style="padding:0.75rem 1rem;">
+                <h3 style="margin-bottom:0.5rem;">Ingreso de Voucher de Diario</h3>
+                
+                <div class="input-group" style="margin-bottom:0.5rem;">
+                  <label for="v-glosa" style="font-size:0.8rem;">Glosa / Operación:</label>
+                  <input type="text" id="v-glosa" value="Cobro de factura F001-100 en efectivo" class="search-input" style="padding:0.4rem; height:auto; font-size:0.8rem;">
+                </div>
+                
+                <!-- Ingreso de cuentas rápido -->
+                <div style="border-top:1px dashed var(--border); padding-top:0.5rem; margin-top:0.5rem;">
+                  <div style="display:grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr 0.5fr; gap:0.25rem;">
+                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
+                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Cuenta (PCGE)</label>
+                      <input type="text" id="v-cuenta" placeholder="Ej: 101" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem; font-weight:700;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
+                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Descripción</label>
+                      <input type="text" id="v-desc" placeholder="Caja" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem; background:var(--border);" readonly>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
+                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Debe (S/.)</label>
+                      <input type="number" id="v-debe" placeholder="0.00" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
+                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Haber (S/.)</label>
+                      <input type="number" id="v-haber" placeholder="0.00" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; justify-content:flex-end;">
+                      <button class="btn-primary" id="btn-add-voucher-row" style="padding:0.4rem; font-size:0.85rem; font-weight:800; height:32px; width:100%; border-radius:6px; display:flex; align-items:center; justify-content:center;">+</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Tabla del Asiento -->
+                <div class="voucher-table-wrapper" style="margin-top:0.75rem; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--bg-input);">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.75rem; text-align:left;">
+                    <thead>
+                      <tr style="background:var(--border); font-weight:700; border-bottom:1px solid var(--border);">
+                        <th style="padding:0.4rem 0.5rem;">Cta</th>
+                        <th style="padding:0.4rem 0.5rem;">Nombre Cuenta</th>
+                        <th style="padding:0.4rem 0.5rem; text-align:right; width:65px;">Debe</th>
+                        <th style="padding:0.4rem 0.5rem; text-align:right; width:65px;">Haber</th>
+                        <th style="padding:0.4rem 0.5rem; text-align:center; width:30px;">x</th>
+                      </tr>
+                    </thead>
+                    <tbody id="voucher-rows-container">
+                      <!-- Filas de asiento dinámicas -->
+                    </tbody>
+                    <tfoot>
+                      <tr style="font-weight:700; border-top:1px solid var(--border); background:var(--glass-bg);">
+                        <td colspan="2" style="padding:0.4rem 0.5rem; text-align:right;">Totales:</td>
+                        <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--debe);" id="v-total-debe">S/ 0.00</td>
+                        <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--haber);" id="v-total-haber">S/ 0.00</td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                
+                <div class="voucher-actions" style="margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+                  <button class="btn-secondary" id="btn-clear-voucher" style="font-size:0.75rem; padding:0.4rem 0.75rem;">Limpiar</button>
+                  <button class="btn-primary" id="btn-post-voucher" style="font-size:0.75rem; padding:0.4rem 0.75rem;">Procesar Voucher (Post)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Panel Balance de Comprobación -->
+          <div class="sub-panel" id="panel-balance">
+            <div class="course-content-scroll" style="padding:0.5rem 1rem;">
+              <div class="results-card" style="margin-top:0; padding:0.75rem 1rem;">
+                <h3 style="font-size:0.95rem; border-bottom:1px solid var(--border); padding-bottom:0.25rem; margin-bottom:0.5rem;">Suma de Saldos</h3>
+                <div style="overflow-x:auto;">
+                  <table class="balance-sheet-table" style="width:100%; border-collapse:collapse; font-size:0.7rem; text-align:left;">
+                    <thead>
+                      <tr style="background:var(--border); font-weight:700; border-bottom:1px solid var(--border);">
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:center;">Cta</th>
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border);">Cuenta Descripción</th>
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Debe</th>
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Haber</th>
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Deudor</th>
+                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Acreedor</th>
+                      </tr>
+                    </thead>
+                    <tbody id="balance-sheet-rows">
+                      <!-- Filas acumuladas del balance contable -->
+                    </tbody>
+                    <tfoot>
+                      <tr style="font-weight:700; background:var(--border);">
+                        <td colspan="2" style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">Totales:</td>
+                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sum-debe">S/ 0.00</td>
+                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sum-haber">S/ 0.00</td>
+                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sal-deudor">S/ 0.00</td>
+                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sal-acreedor">S/ 0.00</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                
+                <button class="btn-secondary" id="btn-reset-balance" style="margin-top:0.75rem; padding:0.35rem 0.75rem; font-size:0.75rem; width:100%;">Borrar Balance y Empezar de Nuevo</button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -135,13 +839,13 @@
 
     <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV) -->
     <nav class="bottom-nav" id="bottom-nav" aria-label="Menú de navegación inferior">
-      <button class="nav-item active" id="nav-op" data-screen="op-list">
-        <span class="nav-icon">📋</span>
-        <span>Asientos Contables</span>
+      <button class="nav-item active" id="nav-home" data-screen="hub">
+        <span class="nav-icon">🏠</span>
+        <span>Inicio</span>
       </button>
-      <button class="nav-item" id="nav-pcge" data-screen="pcge">
-        <span class="nav-icon">🔍</span>
-        <span>Búsqueda de Cuentas</span>
+      <button class="nav-item" id="nav-dinamica" data-screen="dinamica">
+        <span class="nav-icon">📊</span>
+        <span>Dinámica NIIF</span>
       </button>
     </nav>
 

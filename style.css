@@ -151,6 +151,13 @@ header {
   font-size: 1.05rem;
 }
 
+.logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
 .logo-section h1 {
   font-family: var(--font-title);
   font-weight: 700;
@@ -980,7 +987,6 @@ header {
   }
 }
 
-@media (min-width: 1200px) {
   /* Grid de 3 columnas en pantallas grandes */
   .pcge-results-list {
     grid-template-columns: repeat(3, 1fr);
@@ -991,5 +997,627 @@ header {
     grid-column: span 3;
   }
 }
+
+
+/* ==========================================
+   CERTUS CONTAPEDIA - PORTAL DE CURSOS
+   ========================================== */
+
+/* Hero / Banner Principal */
+.hub-hero {
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 18px;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.hub-hero h2 {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.35rem;
+}
+
+.hub-hero p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Grid de Cursos */
+.courses-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-bottom: 2rem;
+}
+
+/* Tarjeta / Botón del Curso */
+.course-card {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+}
+
+.course-card:hover, .course-card:focus {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.course-card:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.card-icon-wrapper {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.85rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-icon {
+  font-size: 1.35rem;
+}
+
+.card-body {
+  flex-grow: 1;
+}
+
+.card-body h3 {
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.15rem;
+}
+
+.card-body p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.card-arrow {
+  font-size: 1.15rem;
+  color: var(--primary);
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover .card-arrow {
+  transform: translateX(3px);
+}
+
+/* Estilos de Color para Iconos del Hub */
+.card-dinamica .card-icon-wrapper { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+.card-costos .card-icon-wrapper { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; }
+.card-tributacion .card-icon-wrapper { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+.card-auditoria .card-icon-wrapper { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
+.card-logica .card-icon-wrapper { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+.card-sistemas .card-icon-wrapper { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; }
+
+/* Sub-navegación por pestañas */
+.sub-tabs-container {
+  padding: 0.65rem 1rem 0.5rem 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  z-index: 5;
+}
+
+.sub-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 0.2rem;
+  gap: 0.2rem;
+}
+
+[data-theme="dark"] .sub-tabs {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sub-tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.45rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sub-tab-btn.active {
+  background: var(--bg-input);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.sub-panels-wrapper {
+  flex-grow: 1;
+  position: relative;
+  height: calc(100% - 46px);
+  overflow: hidden;
+}
+
+.sub-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Scrollable Container para Contenidos */
+.course-content-scroll {
+  padding: 1rem;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.course-header-desc {
+  padding: 0.85rem 1rem 0 1rem;
+}
+
+.course-header-desc h2 {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.course-header-desc p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* Estructuras de Entrada (Inputs) */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.6rem;
+}
+
+.input-group label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.input-group input[type="number"],
+.input-group select {
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease;
+  height: 34px;
+}
+
+.input-group input[type="number"]:focus,
+.input-group select:focus {
+  border-color: var(--primary);
+}
+
+/* Botones */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--glow-primary);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  height: 36px;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--border);
+  color: var(--text-main);
+  border: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: 36px;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Desglose de resultados */
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.result-row strong {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+}
+
+/* Fórmulas */
+.formula-box {
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.formula-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.formula-math {
+  font-family: 'Cambria', 'Georgia', serif;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 0.4rem 0;
+  color: var(--primary);
+  word-wrap: break-word;
+}
+
+/* Boleta Laboral */
+.boleta-section h4 {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.boleta-row {
+  margin-bottom: 0.2rem;
+}
+
+.negative {
+  color: var(--haber) !important;
+}
+
+.positive {
+  color: var(--debe) !important;
+}
+
+/* Matriz de Riesgos */
+.risk-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease;
+}
+
+.risk-card:hover {
+  transform: translateY(-2px);
+}
+
+.risk-level-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.risk-level-badge.alto { background: var(--haber-light); color: var(--haber); }
+.risk-level-badge.medio { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+.risk-level-badge.bajo { background: var(--primary-light); color: var(--primary); }
+
+.risk-title {
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.risk-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.risk-control {
+  border-top: 1px dashed var(--border);
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--primary-hover);
+}
+
+.risk-control strong {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Auditoría */
+.audit-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.02);
+}
+
+[data-theme="dark"] .audit-check-item {
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+}
+
+.audit-check-item input[type="checkbox"] {
+  margin-top: 0.15rem;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.audit-check-item span {
+  line-height: 1.3;
+}
+
+/* Lógica */
+.logic-ops-row {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-op-logic {
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-op-logic:hover {
+  background: var(--border) !important;
+}
+
+.truth-table {
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.truth-table th, .truth-table td {
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.45rem;
+}
+
+.truth-table th {
+  background: var(--border);
+  font-weight: 700;
+}
+
+.truth-table tr:nth-child(even) {
+  background: var(--glass-bg);
+}
+
+.challenge-option-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.challenge-option-btn:hover {
+  background: var(--border);
+}
+
+.challenge-option-btn.selected-correct {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-hover) !important;
+  font-weight: 700;
+}
+
+.challenge-option-btn.selected-incorrect {
+  background: var(--haber-light) !important;
+  border-color: var(--haber) !important;
+  color: var(--haber) !important;
+  font-weight: 700;
+}
+
+/* Voucher Simulator */
+.voucher-row-el td {
+  padding: 0.35rem 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.voucher-row-el:hover {
+  background: var(--glass-bg);
+}
+
+.btn-remove-row {
+  background: none;
+  border: none;
+  color: var(--haber);
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Adaptación Desktop */
+@media (min-width: 768px) {
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hub-hero {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2.25rem 2.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .courses-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== TABLA DE RESUMEN DE ELEMENTOS (DINÁMICA NIIF) ===== */
+.elements-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.elements-summary-table th {
+  background: #1e1b4b !important; /* Deep Navy de la imagen */
+  color: #ffffff !important;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.45rem 0.5rem;
+  text-align: center;
+}
+
+.elements-summary-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.elements-summary-table tr:hover {
+  background: rgba(16, 185, 129, 0.03);
+}
+
+[data-theme="dark"] .elements-summary-table tr:hover {
+  background: rgba(52, 211, 153, 0.03);
+}
+
+.elements-summary-table .col-code {
+  font-weight: 800;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: var(--primary);
+}
+
+.elements-summary-table .col-name {
+  font-weight: 600;
+}
+
+.elements-summary-table .positive-bg {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.elements-summary-table .negative-bg {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.elements-summary-table .col-exc {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* Botones del Hub de Dinámica */
+.dinamica-hub-btn {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+.dinamica-hub-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary) !important;
+}
+
+.dinamica-hub-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+
 
 

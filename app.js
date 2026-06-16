@@ -159,6 +159,7 @@ const operations = [
 
 // ===== LÓGICA DE NAVEGACIÓN Y ENRUTADOR =====
 let activeOpId = null;
+let navigationHistory = ["hub"];
 
 function navigateTo(screenId) {
   // Ocultar todas las pantallas y quitar animación
@@ -175,7 +176,8 @@ function navigateTo(screenId) {
   // Actualizar Bottom Navigation activos
   document.querySelectorAll(".nav-item").forEach(item => {
     const itemScreen = item.dataset.screen;
-    if (itemScreen === screenId || (screenId === "op-detail" && itemScreen === "op-list")) {
+    if ((itemScreen === "hub" && screenId === "hub") ||
+        (itemScreen === "dinamica" && (screenId === "dinamica" || screenId === "op-detail"))) {
       item.classList.add("active");
     } else {
       item.classList.remove("active");
@@ -187,28 +189,191 @@ function navigateTo(screenId) {
   const logoIcon = document.getElementById("logo-icon");
   const logoText = document.getElementById("logo-text");
   
-  backBtn.style.display = "none";
-  logoIcon.style.display = "flex";
-  logoText.textContent = "DINAMICA CONTABLE 2026 1";
+  let headerTitle = "CERTUS CONTAPEDIA";
+  let showBack = true;
+  
+  switch (screenId) {
+    case "hub":
+      headerTitle = "CERTUS CONTAPEDIA";
+      showBack = false;
+      break;
+    case "dinamica":
+      headerTitle = "DINAMICA - NIIF";
+      break;
+    case "op-detail":
+      headerTitle = "ASIENTO CONTABLE";
+      break;
+    case "costos":
+      headerTitle = "GERENCIAL - COSTOS";
+      break;
+    case "tributacion":
+      headerTitle = "TRIBUTACIÓN - LABORAL";
+      break;
+    case "auditoria":
+      headerTitle = "AUDITORÍA - CTRL INT.";
+      break;
+    case "logica":
+      headerTitle = "PENSAMIENTO LÓGICO";
+      break;
+    case "sistemas":
+      headerTitle = "SISTEMAS CONTABLES";
+      break;
+  }
+  
+  logoText.textContent = headerTitle;
+  if (logoIcon && logoIcon.tagName !== "IMG") {
+    logoIcon.textContent = headerTitle.charAt(0);
+  }
+  
+  if (showBack) {
+    backBtn.style.display = "flex";
+    if (logoIcon) logoIcon.style.display = "none";
+  } else {
+    backBtn.style.display = "none";
+    if (logoIcon) logoIcon.style.display = "block";
+  }
+  
+  // Guardar en historial si es diferente al último
+  if (navigationHistory[navigationHistory.length - 1] !== screenId) {
+    navigationHistory.push(screenId);
+  }
+
+  // Si navegamos a la pantalla de Dinámica, nos aseguramos de mostrar su panel principal (hub)
+  if (screenId === "dinamica") {
+    showDinamicaPanel("panel-dinamica-hub");
+  }
+}
+
+// Cambiar de panel interno dentro de la pantalla de Dinámica
+function showDinamicaPanel(panelId) {
+  const container = document.getElementById("screen-dinamica");
+  if (!container) return;
+  
+  container.querySelectorAll(".sub-panel").forEach(panel => {
+    panel.classList.remove("active");
+  });
+  
+  const target = document.getElementById(panelId);
+  if (target) {
+    target.classList.add("active");
+  }
 }
 
 // Configurar clicks de botones de navegación
 function setupNavigation() {
+  // Botones del Hub de Cursos
+  document.querySelectorAll(".course-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const screen = card.dataset.screen;
+      navigateTo(screen);
+    });
+  });
+
+  // Items de la barra de navegación inferior
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const screen = btn.dataset.screen;
-      if (screen === "op-list") {
-        selectOperation(6);
-        navigateTo("op-detail");
-      } else {
-        navigateTo(screen);
-      }
+      navigateTo(screen);
     });
   });
   
+  // Botones de Dinámica Hub a subpaneles
+  const toCatalogo = document.getElementById("btn-to-catalogo");
+  if (toCatalogo) {
+    toCatalogo.addEventListener("click", () => {
+      showDinamicaPanel("panel-catalogo");
+    });
+  }
+  
+  const toAsientos = document.getElementById("btn-to-asientos");
+  if (toAsientos) {
+    toAsientos.addEventListener("click", () => {
+      showDinamicaPanel("panel-asientos");
+    });
+  }
+  
+  const toPlan = document.getElementById("btn-to-plan");
+  if (toPlan) {
+    toPlan.addEventListener("click", () => {
+      showDinamicaPanel("panel-dinamica-plan");
+    });
+  }
+  
+  const toGeneralidades = document.getElementById("btn-to-generalidades");
+  if (toGeneralidades) {
+    toGeneralidades.addEventListener("click", () => {
+      showDinamicaPanel("panel-generalidades");
+    });
+  }
+  
+  // Botones de regreso dentro de los subpaneles de Dinámica
+  document.querySelectorAll(".btn-back-to-dinamica-hub").forEach(btn => {
+    btn.addEventListener("click", () => {
+      showDinamicaPanel("panel-dinamica-hub");
+    });
+  });
+  
+  // Botón Volver
   document.getElementById("back-btn").addEventListener("click", () => {
-    selectOperation(6);
-    navigateTo("op-detail");
+    // Si estamos en la pantalla de dinámica y no estamos en el hub, volver al hub de dinámica
+    const screenDinamica = document.getElementById("screen-dinamica");
+    if (screenDinamica && screenDinamica.classList.contains("active")) {
+      const hubPanel = document.getElementById("panel-dinamica-hub");
+      if (hubPanel && !hubPanel.classList.contains("active")) {
+        showDinamicaPanel("panel-dinamica-hub");
+        return;
+      }
+    }
+
+    if (navigationHistory[navigationHistory.length - 1] === "op-detail") {
+      // Si estamos regresando de op-detail, ir al panel de asientos más comunes
+      if (screenDinamica) {
+        navigationHistory.pop(); // Sacar op-detail
+        navigateTo("dinamica");
+        showDinamicaPanel("panel-asientos");
+        return;
+      }
+    }
+
+    if (navigationHistory.length > 1) {
+      navigationHistory.pop(); // Sacar pantalla actual
+      const prevScreen = navigationHistory.pop(); // Sacar anterior para navegar de nuevo
+      navigateTo(prevScreen);
+    } else {
+      navigateTo("hub");
+    }
+  });
+}
+
+// Notificaciones flotantes tipo Toast
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `toast show ${type}`;
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
+// Configurar Sub-pestañas internas en las pantallas de cursos
+function setupSubTabs() {
+  document.querySelectorAll(".sub-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const parentScreen = btn.closest(".screen");
+      const targetPanelId = btn.dataset.panel;
+      
+      // Desactivar botones de pestaña de esta pantalla
+      parentScreen.querySelectorAll(".sub-tab-btn").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      
+      // Desactivar paneles de esta pantalla
+      parentScreen.querySelectorAll(".sub-panel").forEach(p => p.classList.remove("active"));
+      const targetPanel = parentScreen.querySelector(`#${targetPanelId}`);
+      if (targetPanel) {
+        targetPanel.classList.add("active");
+      }
+    });
   });
 }
 
@@ -216,12 +381,22 @@ function setupNavigation() {
 document.addEventListener("DOMContentLoaded", () => {
   setupTheme();
   setupNavigation();
+  setupSubTabs();
+  
+  // Inicializaciones de dinámica
   renderOperationsList();
   setupSearchFilters();
   setupPcgeExplorer();
   
-  // Por defecto ir directamente al explorador PCGE (Buscador)
-  navigateTo("pcge");
+  // Inicialización de nuevos módulos de cursos
+  setupCostosModule();
+  setupTributacionModule();
+  setupAuditoriaModule();
+  setupLogicaModule();
+  setupSistemasModule();
+  
+  // Por defecto ir al portal CERTUS CONTAPEDIA (Hub)
+  navigateTo("hub");
 });
 
 // Selector de Tema Claro/Oscuro
@@ -1328,5 +1503,645 @@ function getElementoName(elem) {
     case "0": return "Cuentas de Orden";
     default: return "Desconocido";
   }
+}
+
+// ==========================================
+// SECCIONES EXTRA - CURSOS CERTUS CONTAPEDIA
+// ==========================================
+
+// ----- 1. GERENCIAL - COSTOS -----
+function setupCostosModule() {
+  const btn = document.getElementById("btn-calc-costos");
+  if (!btn) return;
+  
+  btn.addEventListener("click", () => {
+    const cf = parseFloat(document.getElementById("costos-fijos").value) || 0;
+    const pvu = parseFloat(document.getElementById("precio-unitario").value) || 0;
+    const cvu = parseFloat(document.getElementById("costo-variable").value) || 0;
+    
+    if (pvu <= cvu) {
+      showToast("El precio de venta debe ser mayor al costo variable unitario.", "error");
+      return;
+    }
+    
+    const mcu = pvu - cvu;
+    const mcuPct = (mcu / pvu) * 100;
+    const peUnidades = cf / mcu;
+    const peSoles = peUnidades * pvu;
+    
+    document.getElementById("res-mcu").textContent = `S/ ${mcu.toFixed(2)}`;
+    document.getElementById("res-mcu-pct").textContent = `${mcuPct.toFixed(2)}%`;
+    document.getElementById("res-pe-unidades").textContent = `${Math.ceil(peUnidades)} Unidades`;
+    document.getElementById("res-pe-soles").textContent = `S/ ${peSoles.toFixed(2)}`;
+    
+    // Gráfico de barra de estructura
+    const cvuPct = (cvu / pvu) * 100;
+    const mcuPctBar = (mcu / pvu) * 100;
+    
+    const barCvu = document.getElementById("bar-cvu");
+    const barMcu = document.getElementById("bar-mcu");
+    barCvu.style.width = `${cvuPct}%`;
+    barCvu.textContent = `CVU: ${cvuPct.toFixed(0)}%`;
+    barMcu.style.width = `${mcuPctBar}%`;
+    barMcu.textContent = `MCU: ${mcuPctBar.toFixed(0)}%`;
+    
+    document.getElementById("costos-results").style.display = "block";
+    
+    // Volver a renderizar fórmulas en MathJax si está cargado
+    if (window.MathJax && window.MathJax.typeset) {
+      window.MathJax.typeset();
+    }
+  });
+}
+
+// ----- 2. TRIBUTACIÓN - LABORAL -----
+function setupTributacionModule() {
+  // Planilla
+  const btnPlanilla = document.getElementById("btn-calc-planilla");
+  if (btnPlanilla) {
+    btnPlanilla.addEventListener("click", () => {
+      const sueldo = parseFloat(document.getElementById("sueldo-basico").value) || 0;
+      const asigFamChecked = document.getElementById("asig-familiar").checked;
+      const asigFamVal = asigFamChecked ? 102.50 : 0;
+      const totalRem = sueldo + asigFamVal;
+      
+      const system = document.getElementById("regimen-pension").value;
+      let pensionRate = 0.13;
+      let pensionName = "ONP";
+      
+      if (system === "afp-integra") {
+        pensionRate = 0.128;
+        pensionName = "AFP Integra";
+      } else if (system === "afp-prima") {
+        pensionRate = 0.129;
+        pensionName = "AFP Prima";
+      } else if (system === "afp-profuturo") {
+        pensionRate = 0.130;
+        pensionName = "AFP Profuturo";
+      }
+      
+      const pensionVal = totalRem * pensionRate;
+      const neto = totalRem - pensionVal;
+      const essalud = totalRem * 0.09;
+      
+      const grati = totalRem / 6;
+      const cts = (totalRem + grati) / 12;
+      const vac = totalRem / 12;
+      
+      document.getElementById("bol-basico").textContent = `S/ ${sueldo.toFixed(2)}`;
+      document.getElementById("bol-asig").textContent = `S/ ${asigFamVal.toFixed(2)}`;
+      document.getElementById("bol-total-rem").textContent = `S/ ${totalRem.toFixed(2)}`;
+      document.getElementById("bol-pension-lbl").textContent = pensionName;
+      document.getElementById("bol-pension-val").textContent = `-S/ ${pensionVal.toFixed(2)}`;
+      document.getElementById("bol-neto").textContent = `S/ ${neto.toFixed(2)}`;
+      document.getElementById("bol-essalud").textContent = `S/ ${essalud.toFixed(2)}`;
+      document.getElementById("bol-grati").textContent = `S/ ${grati.toFixed(2)}`;
+      document.getElementById("bol-cts").textContent = `S/ ${cts.toFixed(2)}`;
+      document.getElementById("bol-vacaciones").textContent = `S/ ${vac.toFixed(2)}`;
+      
+      document.getElementById("planilla-results").style.display = "block";
+    });
+  }
+  
+  // IGV y detracciones
+  const btnTributos = document.getElementById("btn-calc-tributos");
+  if (btnTributos) {
+    btnTributos.addEventListener("click", () => {
+      const monto = parseFloat(document.getElementById("monto-operacion").value) || 0;
+      const tipo = document.getElementById("tipo-monto").value;
+      const tasaDet = parseFloat(document.getElementById("tasa-detraccion").value) || 0;
+      
+      let base = 0;
+      let igv = 0;
+      let total = 0;
+      
+      if (tipo === "base") {
+        base = monto;
+        igv = base * 0.18;
+        total = base + igv;
+      } else {
+        total = monto;
+        base = total / 1.18;
+        igv = total - base;
+      }
+      
+      const det = total * tasaDet;
+      const neto = total - det;
+      
+      document.getElementById("trib-base").textContent = `S/ ${base.toFixed(2)}`;
+      document.getElementById("trib-igv").textContent = `S/ ${igv.toFixed(2)}`;
+      document.getElementById("trib-total").textContent = `S/ ${total.toFixed(2)}`;
+      document.getElementById("trib-det-pct").textContent = `${(tasaDet * 100).toFixed(0)}%`;
+      document.getElementById("trib-det-val").textContent = `S/ ${det.toFixed(2)}`;
+      document.getElementById("trib-neto-pagar").textContent = `S/ ${neto.toFixed(2)}`;
+      
+      document.getElementById("tributos-results").style.display = "block";
+    });
+  }
+}
+
+// ----- 3. AUDITORÍA Y CONTROL INTERNO -----
+const risksData = [
+  { area: "caja", level: "alto", title: "Pagos duplicados o no autorizados", desc: "El área de tesorería emite transferencias sin doble firma o sustento de facturas aprobadas.", control: "Implementar firmas mancomunadas y conciliación bancaria diaria por un personal ajeno a tesorería." },
+  { area: "caja", level: "medio", title: "Diferencias no explicadas en arqueo de caja", desc: "La caja chica de la empresa presenta faltantes constantes al final del día.", control: "Realizar arqueos sorpresivos frecuentes y establecer responsabilidad económica al cajero." },
+  { area: "inventarios", level: "alto", title: "Robo sistemático de mercaderías en almacén", desc: "Falta de cámaras de seguridad y control de acceso peatonal en la zona de almacenamiento de alto valor.", control: "Implementar tarjetas electrónicas de acceso, inventarios cíclicos mensuales y cámaras de seguridad CCTV." },
+  { area: "inventarios", level: "bajo", title: "Obsolescencia de mercaderías no identificada", desc: "Productos guardados por más de un año no se castigan o desvalorizan contablemente.", control: "Establecer una política de desvalorización automática según el reporte de rotación del ERP." },
+  { area: "cobrar", level: "alto", title: "Ventas a crédito a clientes con alto riesgo de morosidad", desc: "El equipo comercial otorga líneas de crédito de forma autónoma sin evaluación del área de riesgos.", control: "Establecer flujos de aprobación centralizados y scoring de crédito previo al despacho." },
+  { area: "cobrar", level: "medio", title: "Falta de conciliación de saldos de clientes", desc: "Los clientes reclaman cobros de facturas ya pagadas debido a fallas en la aplicación del depósito contable.", control: "Envío mensual de estados de cuenta detallados para confirmación de saldos con el cliente." },
+  { area: "compras", level: "medio", title: "Adquisiciones con sobreprecio", desc: "Se realizan compras directas a proveedores sin solicitar cotizaciones comparativas.", control: "Establecer política de compras que exija un mínimo de tres cotizaciones aprobadas para montos mayores a 1 UIT." }
+];
+
+const auditProcedures = {
+  efectivo: [
+    "Obtener las conciliaciones bancarias de fin de mes y verificar la precisión matemática.",
+    "Confirmar los saldos bancarios directamente con las entidades financieras (carta de confirmación).",
+    "Realizar un arqueo de efectivo en caja chica al cierre del ejercicio, presenciado por el custodio.",
+    "Verificar que las partidas en tránsito (depósitos o cheques no cobrados) hayan sido liquidadas el mes posterior."
+  ],
+  ventas: [
+    "Seleccionar una muestra de facturas de venta y cruzarlas con sus respectivas guías de remisión y órdenes de compra.",
+    "Enviar solicitudes de confirmación de saldos (circularización) a clientes clave y conciliar respuestas.",
+    "Evaluar la razonabilidad de la provisión para cuentas de cobranza dudosa según políticas internas y tributarias.",
+    "Realizar pruebas de corte de ventas de fin de año para asegurar que las transacciones se registren en el período correcto."
+  ],
+  inventarios: [
+    "Participar físicamente en la toma de inventario físico anual de almacenes y realizar conteos de prueba.",
+    "Verificar la correcta valuación de los inventarios (Método Promedio o PEPS) y asegurar su costo neto realizable.",
+    "Revisar el listado de existencias de lento movimiento u obsoletas para constatar la provisión de desvalorización.",
+    "Cruzar el reporte de inventario físico con los saldos del Kardex valorizado en el libro contable oficial."
+  ]
+};
+
+function setupAuditoriaModule() {
+  // Matriz de riesgos filtro
+  const selectArea = document.getElementById("select-area-riesgo");
+  if (selectArea) {
+    selectArea.addEventListener("change", (e) => {
+      renderRisks(e.target.value);
+    });
+    renderRisks("todos");
+  }
+  
+  // Programa de auditoría
+  document.querySelectorAll(".btn-audit-select").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".btn-audit-select").forEach(b => {
+        b.classList.remove("active");
+        b.style.background = "var(--border)";
+        b.style.color = "var(--text-main)";
+      });
+      btn.classList.add("active");
+      btn.style.background = "var(--primary)";
+      btn.style.color = "white";
+      
+      const auditType = btn.dataset.audit;
+      renderAuditChecklist(auditType);
+    });
+  });
+  renderAuditChecklist("efectivo");
+}
+
+function renderRisks(areaFilter) {
+  const container = document.getElementById("risk-matrix-list");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  const filtered = risksData.filter(r => areaFilter === "todos" || r.area === areaFilter);
+  
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:1rem;">No se encontraron riesgos para esta área.</p>`;
+    return;
+  }
+  
+  filtered.forEach(risk => {
+    const card = document.createElement("div");
+    card.className = "risk-card";
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="risk-level-badge ${risk.level}">${risk.level}</span>
+        <span style="font-size:0.65rem; color:var(--text-muted); font-weight:700;">Área: ${risk.area.toUpperCase()}</span>
+      </div>
+      <h4 class="risk-title">${risk.title}</h4>
+      <p class="risk-desc">${risk.desc}</p>
+      <div class="risk-control">
+        <strong>Control Mitigante:</strong> ${risk.control}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderAuditChecklist(type) {
+  const container = document.getElementById("audit-checklist");
+  const titleText = document.getElementById("audit-title-text");
+  if (!container) return;
+  
+  container.innerHTML = "";
+  
+  let titleLabel = "Procedimientos para Caja-Bancos";
+  if (type === "ventas") titleLabel = "Procedimientos para Cuentas por Cobrar y Ventas";
+  if (type === "inventarios") titleLabel = "Procedimientos para Inventarios y Almacenes";
+  if (titleText) titleText.textContent = titleLabel;
+  
+  const procedures = auditProcedures[type] || [];
+  procedures.forEach((proc, idx) => {
+    const div = document.createElement("label");
+    div.className = "audit-check-item";
+    div.innerHTML = `
+      <input type="checkbox" id="chk-proc-${type}-${idx}">
+      <span>${proc}</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ----- 4. PENSAMIENTO LÓGICO -----
+const challenges = [
+  {
+    id: 1,
+    question: "¿Cuál es el saldo final de la cuenta 10 (Efectivo)?",
+    body: "La empresa inicia el día con un saldo de S/ 5,000 en Caja. Durante la mañana realiza las siguientes transacciones:\n1. Cobra una factura de clientes por S/ 2,500 en efectivo.\n2. Paga a un proveedor de mercaderías S/ 1,800 al contado.\n3. Paga el recibo de luz por S/ 300 con efectivo.",
+    options: ["S/ 5,700", "S/ 5,400", "S/ 7,200", "S/ 4,900"],
+    correct: 1
+  },
+  {
+    id: 2,
+    question: "¿Qué cuenta debe cargarse (Debe) en el asiento de compra de mercaderías?",
+    body: "La empresa realiza una compra de mercaderías según el PCGE peruano. De acuerdo a la naturaleza de la transacción, el gasto se clasifica y se debita inicialmente en compras.",
+    options: ["Cuenta 101 - Caja", "Cuenta 201 - Mercaderías", "Cuenta 601 - Mercaderías", "Cuenta 421 - Facturas por pagar"],
+    correct: 2
+  },
+  {
+    id: 3,
+    question: "Si Ventas = S/ 10,000, Costo de Ventas = S/ 6,000 y Gastos Operativos = S/ 2,000, ¿cuál es la Utilidad Operativa?",
+    body: "Calcula la Utilidad Bruta restando el Costo de Ventas a los Ingresos por Ventas, y luego resta los Gastos Operativos para obtener la Utilidad Operativa.",
+    options: ["S/ 4,000", "S/ 8,000", "S/ 2,000", "S/ 6,000"],
+    correct: 2
+  }
+];
+
+let currentChallengeIdx = 0;
+
+function setupLogicaModule() {
+  const logicOps = document.querySelectorAll(".btn-op-logic");
+  const exprInput = document.getElementById("logic-expr");
+  
+  if (exprInput) {
+    logicOps.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const op = btn.dataset.op;
+        if (op === "~") {
+          exprInput.value = "~p";
+        } else {
+          exprInput.value = `p ${op} q`;
+        }
+      });
+    });
+    
+    document.getElementById("btn-clear-logic").addEventListener("click", () => {
+      exprInput.value = "p → q";
+      document.getElementById("logic-table-results").style.display = "none";
+    });
+    
+    document.getElementById("btn-generate-table").addEventListener("click", () => {
+      generateTruthTable(exprInput.value);
+    });
+  }
+  
+  setupChallenges();
+}
+
+function evaluateLogic(expr, p, q) {
+  let clean = expr.replace(/\s+/g, "");
+  
+  if (clean === "p") return p;
+  if (clean === "q") return q;
+  if (clean === "~p") return !p;
+  if (clean === "~q") return !q;
+  
+  if (clean.includes("∧")) return p && q;
+  if (clean.includes("∨")) return p || q;
+  if (clean.includes("→")) return !p || q;
+  if (clean.includes("↔")) return p === q;
+  
+  return p;
+}
+
+function generateTruthTable(expr) {
+  const table = document.getElementById("truth-table-el");
+  if (!table) return;
+  
+  table.innerHTML = "";
+  
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>p</th>
+      <th>q</th>
+      <th>${expr}</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+  
+  const tbody = document.createElement("tbody");
+  const combinations = [
+    { p: true, q: true },
+    { p: true, q: false },
+    { p: false, q: true },
+    { p: false, q: false }
+  ];
+  
+  let trueCount = 0;
+  let falseCount = 0;
+  
+  combinations.forEach(combo => {
+    const res = evaluateLogic(expr, combo.p, combo.q);
+    if (res) trueCount++;
+    else falseCount++;
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${combo.p ? "V" : "F"}</td>
+      <td>${combo.q ? "V" : "F"}</td>
+      <td style="font-weight: 700; color: ${res ? "var(--debe)" : "var(--haber)"}">${res ? "V" : "F"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  
+  let classification = "";
+  if (trueCount === 4) {
+    classification = "Clasificación: Tautología (Siempre Verdadero)";
+  } else if (falseCount === 4) {
+    classification = "Clasificación: Contradicción (Siempre Falso)";
+  } else {
+    classification = "Clasificación: Contingencia (Verdadero o Falso)";
+  }
+  
+  document.getElementById("logic-classification-text").textContent = classification;
+  document.getElementById("logic-table-results").style.display = "block";
+}
+
+function setupChallenges() {
+  const nextBtn = document.getElementById("btn-next-challenge");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      currentChallengeIdx = (currentChallengeIdx + 1) % challenges.length;
+      loadChallenge(currentChallengeIdx);
+    });
+  }
+  loadChallenge(0);
+}
+
+function loadChallenge(idx) {
+  const challenge = challenges[idx];
+  const qNumLbl = document.getElementById("challenge-num-lbl");
+  if (!challenge || !qNumLbl) return;
+  
+  qNumLbl.textContent = `Desafío #${challenge.id}`;
+  document.getElementById("challenge-question").textContent = challenge.question;
+  document.getElementById("challenge-body").innerHTML = challenge.body.replace(/\n/g, "<br>");
+  
+  const optionsContainer = document.getElementById("challenge-options");
+  optionsContainer.innerHTML = "";
+  
+  const feedback = document.getElementById("challenge-feedback");
+  feedback.style.display = "none";
+  
+  const nextBtn = document.getElementById("btn-next-challenge");
+  nextBtn.style.display = "none";
+  
+  challenge.options.forEach((opt, optIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "challenge-option-btn";
+    btn.textContent = opt;
+    btn.addEventListener("click", () => {
+      optionsContainer.querySelectorAll(".challenge-option-btn").forEach(b => b.disabled = true);
+      
+      if (optIdx === challenge.correct) {
+        btn.classList.add("selected-correct");
+        feedback.textContent = "¡Excelente! Respuesta correcta.";
+        feedback.style.background = "var(--primary-light)";
+        feedback.style.color = "var(--primary-hover)";
+      } else {
+        btn.classList.add("selected-incorrect");
+        feedback.textContent = `Incorrecto. La respuesta correcta era: ${challenge.options[challenge.correct]}`;
+        feedback.style.background = "var(--haber-light)";
+        feedback.style.color = "var(--haber)";
+        
+        const correctBtn = optionsContainer.children[challenge.correct];
+        if (correctBtn) correctBtn.classList.add("selected-correct");
+      }
+      feedback.style.display = "block";
+      nextBtn.style.display = "block";
+    });
+    optionsContainer.appendChild(btn);
+  });
+}
+
+// ----- 5. SISTEMAS CONTABLES -----
+let voucherRows = [];
+let postedVouchers = [];
+
+function setupSistemasModule() {
+  const accountInput = document.getElementById("v-cuenta");
+  const descInput = document.getElementById("v-desc");
+  const debeInput = document.getElementById("v-debe");
+  const haberInput = document.getElementById("v-haber");
+  const addBtn = document.getElementById("btn-add-voucher-row");
+  
+  if (!accountInput) return;
+  
+  accountInput.addEventListener("input", async (e) => {
+    const code = e.target.value.trim();
+    if (code.length >= 2) {
+      const desc = await getAccountDescription(code);
+      descInput.value = desc !== "—" ? desc : "Cuenta no encontrada";
+    } else {
+      descInput.value = "";
+    }
+  });
+  
+  debeInput.addEventListener("input", () => {
+    if (debeInput.value) haberInput.value = "";
+  });
+  
+  haberInput.addEventListener("input", () => {
+    if (haberInput.value) debeInput.value = "";
+  });
+  
+  addBtn.addEventListener("click", () => {
+    const code = accountInput.value.trim();
+    const desc = descInput.value.trim();
+    const debeVal = parseFloat(debeInput.value) || 0;
+    const haberVal = parseFloat(haberInput.value) || 0;
+    
+    if (!code || desc === "Cuenta no encontrada" || desc === "") {
+      showToast("Ingresa un código de cuenta válido del PCGE.", "error");
+      return;
+    }
+    
+    if (debeVal <= 0 && haberVal <= 0) {
+      showToast("Debes ingresar un importe en el Debe o en el Haber.", "error");
+      return;
+    }
+    
+    voucherRows.push({ code, desc, debe: debeVal, haber: haberVal });
+    
+    accountInput.value = "";
+    descInput.value = "";
+    debeInput.value = "";
+    haberInput.value = "";
+    
+    renderVoucherTable();
+  });
+  
+  document.getElementById("btn-clear-voucher").addEventListener("click", () => {
+    voucherRows = [];
+    renderVoucherTable();
+  });
+  
+  document.getElementById("btn-post-voucher").addEventListener("click", () => {
+    if (voucherRows.length === 0) {
+      showToast("El voucher está vacío.", "error");
+      return;
+    }
+    
+    let totalDebe = 0;
+    let totalHaber = 0;
+    voucherRows.forEach(r => {
+      totalDebe += r.debe;
+      totalHaber += r.haber;
+    });
+    
+    if (Math.abs(totalDebe - totalHaber) > 0.01) {
+      showToast(`¡Asiento descuadrado! Debe cuadrar partida doble por S/ ${Math.abs(totalDebe - totalHaber).toFixed(2)}.`, "error");
+      return;
+    }
+    
+    const glosa = document.getElementById("v-glosa").value || "Voucher Contable";
+    postedVouchers.push({ glosa, entries: [...voucherRows] });
+    
+    voucherRows = [];
+    renderVoucherTable();
+    updateBalanceSheet();
+    
+    showToast("Asiento procesado con éxito.", "success");
+  });
+  
+  document.getElementById("btn-reset-balance").addEventListener("click", () => {
+    postedVouchers = [];
+    updateBalanceSheet();
+    showToast("El Balance de Comprobación ha sido reiniciado.", "info");
+  });
+  
+  renderVoucherTable();
+  updateBalanceSheet();
+}
+
+function renderVoucherTable() {
+  const container = document.getElementById("voucher-rows-container");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  let totalDebe = 0;
+  let totalHaber = 0;
+  
+  voucherRows.forEach((row, index) => {
+    totalDebe += row.debe;
+    totalHaber += row.haber;
+    
+    const tr = document.createElement("tr");
+    tr.className = "voucher-row-el";
+    tr.innerHTML = `
+      <td style="padding:0.4rem 0.5rem; font-weight:700;">${row.code}</td>
+      <td style="padding:0.4rem 0.5rem; color:var(--text-muted); font-size:0.75rem;">${row.desc}</td>
+      <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--debe); font-weight:700;">${row.debe > 0 ? 'S/ ' + row.debe.toFixed(2) : '-'}</td>
+      <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--haber); font-weight:700;">${row.haber > 0 ? 'S/ ' + row.haber.toFixed(2) : '-'}</td>
+      <td style="padding:0.4rem 0.5rem; text-align:center;">
+        <button class="btn-remove-row" onclick="removeVoucherRow(${index})">&times;</button>
+      </td>
+    `;
+    container.appendChild(tr);
+  });
+  
+  document.getElementById("v-total-debe").textContent = `S/ ${totalDebe.toFixed(2)}`;
+  document.getElementById("v-total-haber").textContent = `S/ ${totalHaber.toFixed(2)}`;
+}
+
+window.removeVoucherRow = function(idx) {
+  voucherRows.splice(idx, 1);
+  renderVoucherTable();
+};
+
+function updateBalanceSheet() {
+  const container = document.getElementById("balance-sheet-rows");
+  if (!container) return;
+  
+  container.innerHTML = "";
+  
+  const ledger = {};
+  postedVouchers.forEach(v => {
+    v.entries.forEach(ent => {
+      const code = ent.code;
+      if (!ledger[code]) {
+        ledger[code] = { desc: ent.desc, debe: 0, haber: 0 };
+      }
+      ledger[code].debe += ent.debe;
+      ledger[code].haber += ent.haber;
+    });
+  });
+  
+  const codes = Object.keys(ledger).sort();
+  
+  let totalDebeSum = 0;
+  let totalHaberSum = 0;
+  let totalDeudorSum = 0;
+  let totalAcreedorSum = 0;
+  
+  if (codes.length === 0) {
+    container.innerHTML = `<tr><td colspan="6" style="padding:1rem; text-align:center; color:var(--text-muted); font-style:italic;">No hay transacciones registradas.</td></tr>`;
+    document.getElementById("bal-sum-debe").textContent = "S/ 0.00";
+    document.getElementById("bal-sum-haber").textContent = "S/ 0.00";
+    document.getElementById("bal-sal-deudor").textContent = "S/ 0.00";
+    document.getElementById("bal-sal-acreedor").textContent = "S/ 0.00";
+    return;
+  }
+  
+  codes.forEach(code => {
+    const data = ledger[code];
+    const deb = data.debe;
+    const hab = data.haber;
+    
+    let deudor = 0;
+    let acreedor = 0;
+    
+    if (deb >= hab) {
+      deudor = deb - hab;
+    } else {
+      acreedor = hab - deb;
+    }
+    
+    totalDebeSum += deb;
+    totalHaberSum += hab;
+    totalDeudorSum += deudor;
+    totalAcreedorSum += acreedor;
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); font-weight:700; text-align:center;">${code}</td>
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); font-size:0.7rem; color:var(--text-muted);">${data.desc}</td>
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">S/ ${deb.toFixed(2)}</td>
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">S/ ${hab.toFixed(2)}</td>
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; font-weight:700; color:var(--debe);">${deudor > 0 ? 'S/ ' + deudor.toFixed(2) : '-'}</td>
+      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; font-weight:700; color:var(--haber);">${acreedor > 0 ? 'S/ ' + acreedor.toFixed(2) : '-'}</td>
+    `;
+    container.appendChild(tr);
+  });
+  
+  document.getElementById("bal-sum-debe").textContent = `S/ ${totalDebeSum.toFixed(2)}`;
+  document.getElementById("bal-sum-haber").textContent = `S/ ${totalHaberSum.toFixed(2)}`;
+  document.getElementById("bal-sal-deudor").textContent = `S/ ${totalDeudorSum.toFixed(2)}`;
+  document.getElementById("bal-sal-acreedor").textContent = `S/ ${totalAcreedorSum.toFixed(2)}`;
 }
 
