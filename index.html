@@ -42,72 +42,70 @@
           <p>Explora cursos interactivos y herramientas de simulación para dominar la contabilidad.</p>
         </div>
         
-        <div class="courses-grid">
-          <button class="course-card card-dinamica" data-screen="dinamica">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">📊</span>
+
+        <!-- Grid de Widgets PWA (Segunda Imagen / Dashboard de Gekko) -->
+        <div class="courses-pwa-grid">
+          
+          <!-- Widget 1: Dinámica PCGE (Teal) -->
+          <button class="pwa-card pwa-card-teal" data-screen="dinamica">
+            <div class="pwa-card-header">
+              <span class="pwa-card-icon">📊</span>
+              <span class="pwa-card-title">DINÁMICA DEL PCGE</span>
             </div>
-            <div class="card-body">
-              <h3>DINAMICA - NIIF</h3>
-              <p>Asientos contables comunes del PCGE y explorador de cuentas oficiales.</p>
+            <div class="pwa-card-body">
+              <div class="pwa-card-circle">10</div>
+              <div class="pwa-card-details">
+                <div class="detail-line"><span>PCGE</span><strong>Elem.</strong></div>
+                <div class="detail-line"><span>CUENTAS</span><strong>Plan</strong></div>
+              </div>
             </div>
-            <span class="card-arrow">→</span>
           </button>
           
-          <button class="course-card card-costos" data-screen="costos">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">📉</span>
+          <!-- Widget 2: Contabilidad Gerencial (Amber) -->
+          <button class="pwa-card pwa-card-amber" data-screen="costos">
+            <div class="pwa-card-header">
+              <span class="pwa-card-icon">📉</span>
+              <span class="pwa-card-title">CONTABILIDAD GERENCIAL</span>
             </div>
-            <div class="card-body">
-              <h3>GERENCIAL - COSTOS</h3>
-              <p>Análisis de Punto de Equilibrio y Costo-Volumen-Utilidad.</p>
+            <div class="pwa-card-body">
+              <div class="pwa-card-circle">MCU</div>
+              <div class="pwa-card-details">
+                <div class="detail-line"><span>P.EQ</span><strong>CVP</strong></div>
+                <div class="detail-line"><span>COSTOS</span><strong>Toma Dec.</strong></div>
+              </div>
             </div>
-            <span class="card-arrow">→</span>
           </button>
           
-          <button class="course-card card-tributacion" data-screen="tributacion">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">⚖️</span>
+          <!-- Widget 3: Control Interno (Orange) -->
+          <button class="pwa-card pwa-card-orange" data-screen="auditoria">
+            <div class="pwa-card-header">
+              <span class="pwa-card-icon">🔍</span>
+              <span class="pwa-card-title">CONTROL INTERNO</span>
             </div>
-            <div class="card-body">
-              <h3>TRIBUTACIÓN - LABORAL</h3>
-              <p>Planilla de sueldos y beneficios en Perú, IGV y detracciones en compras.</p>
+            <div class="pwa-card-body">
+              <div class="pwa-card-circle">COSO</div>
+              <div class="pwa-card-details">
+                <div class="detail-line"><span>RIESGOS</span><strong>Matriz</strong></div>
+                <div class="detail-line"><span>CTRLS</span><strong>Proced.</strong></div>
+              </div>
             </div>
-            <span class="card-arrow">→</span>
+          </button>
+
+          <!-- Widget 4: Pensamiento Lógico (Purple) -->
+          <button class="pwa-card pwa-card-purple" data-screen="logica">
+            <div class="pwa-card-header">
+              <span class="pwa-card-icon">🧠</span>
+              <span class="pwa-card-title">PENSAMIENTO LOGICO</span>
+            </div>
+            <div class="pwa-card-body">
+              <div class="pwa-card-circle">V/F</div>
+              <div class="pwa-card-details">
+                <div class="detail-line"><span>TABLA</span><strong>Verdad</strong></div>
+                <div class="detail-line"><span>LOGIC</span><strong>Retos</strong></div>
+              </div>
+            </div>
           </button>
           
-          <button class="course-card card-auditoria" data-screen="auditoria">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">🔍</span>
-            </div>
-            <div class="card-body">
-              <h3>AUDITORIA - CONTROL INTERNO</h3>
-              <p>Matriz de Riesgos COSO y listas de verificación de procedimientos.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
-          
-          <button class="course-card card-logica" data-screen="logica">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">🧠</span>
-            </div>
-            <div class="card-body">
-              <h3>PENSAMIENTO LOGICO</h3>
-              <p>Generador de Tablas de Verdad paso a paso y desafíos lógicos.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
-          
-          <button class="course-card card-sistemas" data-screen="sistemas">
-            <div class="card-icon-wrapper">
-              <span class="card-icon">💻</span>
-            </div>
-            <div class="card-body">
-              <h3>SISTEMAS CONTABLES</h3>
-              <p>Simulador de voucher diario y generación de Balance de Comprobación.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
         </div>
       </main>
 
@@ -119,8 +117,8 @@
           <!-- PANEL PRINCIPAL (HUB DE DINÁMICA) -->
           <div class="sub-panel active" id="panel-dinamica-hub" style="overflow-y: auto; padding: 0.85rem 1rem;">
             
-            <!-- Botones superiores -->
-            <div class="dinamica-hub-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <!-- Contenedor de Botones de Navegación -->
+            <div class="dinamica-hub-buttons-wrapper">
               <button class="dinamica-hub-btn" id="btn-to-catalogo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
                 <span style="font-size: 1.5rem;">📖</span>
                 <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Catálogo de Cuentas</span>
@@ -128,6 +126,14 @@
               <button class="dinamica-hub-btn" id="btn-to-asientos" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
                 <span style="font-size: 1.5rem;">📋</span>
                 <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Asientos más Comunes</span>
+              </button>
+              <button class="dinamica-hub-btn" id="btn-to-plan" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">⚙️</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Dinámica del Plan</span>
+              </button>
+              <button class="dinamica-hub-btn" id="btn-to-generalidades" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                <span style="font-size: 1.5rem;">💡</span>
+                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Generalidades NIIF</span>
               </button>
             </div>
 
@@ -216,18 +222,6 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
-
-            <!-- Botones inferiores -->
-            <div class="dinamica-hub-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-              <button class="dinamica-hub-btn" id="btn-to-plan" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-                <span style="font-size: 1.5rem;">⚙️</span>
-                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Dinámica del Plan</span>
-              </button>
-              <button class="dinamica-hub-btn" id="btn-to-generalidades" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.65rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-                <span style="font-size: 1.5rem;">💡</span>
-                <span style="font-family: var(--font-title); font-size: 0.78rem; font-weight: 700; color: var(--text-main);">Generalidades NIIF</span>
-              </button>
             </div>
 
           </div>
@@ -470,135 +464,6 @@
         </div>
       </main>
 
-      <!-- PANTALLA: TRIBUTACIÓN - LABORAL -->
-      <main class="screen" id="screen-tributacion">
-        <div class="sub-tabs-container">
-          <div class="sub-tabs">
-            <button class="sub-tab-btn active" id="tab-trib-laboral" data-panel="panel-laboral">Planilla Laboral</button>
-            <button class="sub-tab-btn" id="tab-trib-impuestos" data-panel="panel-impuestos">IGV y Detracciones</button>
-          </div>
-        </div>
-        
-        <div class="sub-panels-wrapper">
-          <!-- Panel Planilla Laboral -->
-          <div class="sub-panel active" id="panel-laboral">
-            <div class="course-content-scroll">
-              <div class="calc-card">
-                <h3>Cálculo de Sueldo (Régimen General)</h3>
-                
-                <div class="input-group">
-                  <label for="sueldo-basico">Sueldo Básico Mensual (S/.)</label>
-                  <input type="number" id="sueldo-basico" value="1200" min="1025" step="50">
-                </div>
-                <div class="input-group-checkbox" style="display:flex; align-items:center; gap:0.5rem; margin:0.75rem 0;">
-                  <input type="checkbox" id="asig-familiar" checked style="width:18px; height:18px; cursor:pointer;">
-                  <label for="asig-familiar" style="font-size:0.85rem; cursor:pointer;">Asignación Familiar (+S/ 102.50)</label>
-                </div>
-                <div class="input-group">
-                  <label for="regimen-pension">Sistema de Pensiones (Retención)</label>
-                  <select id="regimen-pension" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
-                    <option value="onp">ONP (13.00%)</option>
-                    <option value="afp-integra">AFP Integra (12.80% prom.)</option>
-                    <option value="afp-prima">AFP Prima (12.90% prom.)</option>
-                    <option value="afp-profuturo">AFP Profuturo (13.00% prom.)</option>
-                  </select>
-                </div>
-                
-                <button class="btn-primary" id="btn-calc-planilla" style="width:100%; margin-top:0.75rem;">Calcular Planilla y Provisiones</button>
-              </div>
-              
-              <div class="results-card" id="planilla-results" style="display:none;">
-                <h3>Simulador de Boleta de Pago</h3>
-                
-                <div class="boleta-table" style="font-size:0.8rem; display:flex; flex-direction:column; gap:0.5rem;">
-                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-                    <h4 style="color:var(--primary); font-weight:700; margin-bottom:0.25rem;">1. INGRESOS TRABAJADOR</h4>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Sueldo Básico:</span><span id="bol-basico">S/ 0.00</span></div>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Asig. Familiar:</span><span id="bol-asig">S/ 0.00</span></div>
-                    <div class="boleta-row font-bold" style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed var(--border); margin-top:0.25rem; padding-top:0.25rem;"><span>Remuneración Computable:</span><span id="bol-total-rem">S/ 0.00</span></div>
-                  </div>
-                  
-                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-                    <h4 style="color:var(--haber); font-weight:700; margin-bottom:0.25rem;">2. DESCUENTOS AL TRABAJADOR</h4>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Pensión (<span id="bol-pension-lbl">ONP</span>):</span><span id="bol-pension-val" style="color:var(--haber);">-S/ 0.00</span></div>
-                    <div class="boleta-row font-bold" style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed var(--border); margin-top:0.25rem; padding-top:0.25rem;"><span>Sueldo Neto a Recibir:</span><span id="bol-neto" style="color:var(--debe);">S/ 0.00</span></div>
-                  </div>
-                  
-                  <div class="boleta-section" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-                    <h4 style="color:var(--text-main); font-weight:700; margin-bottom:0.25rem;">3. APORTES EMPLEADOR</h4>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>EsSalud (9%):</span><span id="bol-essalud">S/ 0.00</span></div>
-                  </div>
-                  
-                  <div class="boleta-section">
-                    <h4 style="color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">4. PROVISIONES MENSUALES</h4>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Gratificaciones (16.67%):</span><span id="bol-grati">S/ 0.00</span></div>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>CTS (9.72% apr.):</span><span id="bol-cts">S/ 0.00</span></div>
-                    <div class="boleta-row" style="display:flex; justify-content:space-between;"><span>Vacaciones (8.33%):</span><span id="bol-vacaciones">S/ 0.00</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Panel IGV y Detracciones -->
-          <div class="sub-panel" id="panel-impuestos">
-            <div class="course-content-scroll">
-              <div class="calc-card">
-                <h3>Cálculo de IGV y Detracción</h3>
-                
-                <div class="input-group">
-                  <label for="monto-operacion">Monto Ingresado (S/.)</label>
-                  <input type="number" id="monto-operacion" value="1000" min="0" step="50">
-                </div>
-                <div class="input-group">
-                  <label for="tipo-monto">Tipo de Monto:</label>
-                  <select id="tipo-monto" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
-                    <option value="base">Valor Venta (No incluye IGV)</option>
-                    <option value="total">Precio Venta (Incluye IGV 18%)</option>
-                  </select>
-                </div>
-                <div class="input-group">
-                  <label for="tasa-detraccion">Tasa de Detracción SUNAT:</label>
-                  <select id="tasa-detraccion" class="search-input" style="padding:0.5rem; height:auto; font-size:0.9rem;">
-                    <option value="0">Sin detracción</option>
-                    <option value="0.10">Servicios Empresariales (10%)</option>
-                    <option value="0.12">Servicios de Limpieza / Seguridad (12%)</option>
-                    <option value="0.04">Transporte de Bienes (4%)</option>
-                    <option value="0.09">Arrendamiento de Bienes (9%)</option>
-                  </select>
-                </div>
-                
-                <button class="btn-primary" id="btn-calc-tributos" style="width:100%; margin-top:0.75rem;">Calcular Liquidación</button>
-              </div>
-              
-              <div class="results-card" id="tributos-results" style="display:none;">
-                <h3>Liquidación de Operación</h3>
-                <div class="result-row">
-                  <span>Valor Base (Subtotal):</span>
-                  <strong id="trib-base">S/ 0.00</strong>
-                </div>
-                <div class="result-row">
-                  <span>IGV (18%):</span>
-                  <strong id="trib-igv">S/ 0.00</strong>
-                </div>
-                <div class="result-row font-bold" style="border-bottom: 1px solid var(--border); padding-bottom:0.5rem;">
-                  <span>Precio de Venta Total:</span>
-                  <strong id="trib-total">S/ 0.00</strong>
-                </div>
-                <div class="result-row" style="margin-top:0.5rem;">
-                  <span>Depósito Detracción (<span id="trib-det-pct">0%</span>):</span>
-                  <strong id="trib-det-val" style="color:var(--haber);">S/ 0.00</strong>
-                </div>
-                <div class="result-row font-bold">
-                  <span>Neto a Pagar al Proveedor:</span>
-                  <strong id="trib-neto-pagar" style="color:var(--debe);">S/ 0.00</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
       <!-- PANTALLA: AUDITORIA - CONTROL INTERNO -->
       <main class="screen" id="screen-auditoria">
         <div class="sub-tabs-container">
@@ -716,125 +581,6 @@
         </div>
       </main>
 
-      <!-- PANTALLA: SISTEMAS CONTABLES -->
-      <main class="screen" id="screen-sistemas">
-        <div class="sub-tabs-container">
-          <div class="sub-tabs">
-            <button class="sub-tab-btn active" id="tab-sis-voucher" data-panel="panel-voucher">Registro de Voucher</button>
-            <button class="sub-tab-btn" id="tab-sis-balance" data-panel="panel-balance">Balance de Comprobación</button>
-          </div>
-        </div>
-        
-        <div class="sub-panels-wrapper">
-          <!-- Panel Registro de Voucher -->
-          <div class="sub-panel active" id="panel-voucher">
-            <div class="course-content-scroll">
-              <div class="calc-card" style="padding:0.75rem 1rem;">
-                <h3 style="margin-bottom:0.5rem;">Ingreso de Voucher de Diario</h3>
-                
-                <div class="input-group" style="margin-bottom:0.5rem;">
-                  <label for="v-glosa" style="font-size:0.8rem;">Glosa / Operación:</label>
-                  <input type="text" id="v-glosa" value="Cobro de factura F001-100 en efectivo" class="search-input" style="padding:0.4rem; height:auto; font-size:0.8rem;">
-                </div>
-                
-                <!-- Ingreso de cuentas rápido -->
-                <div style="border-top:1px dashed var(--border); padding-top:0.5rem; margin-top:0.5rem;">
-                  <div style="display:grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr 0.5fr; gap:0.25rem;">
-                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Cuenta (PCGE)</label>
-                      <input type="text" id="v-cuenta" placeholder="Ej: 101" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem; font-weight:700;">
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Descripción</label>
-                      <input type="text" id="v-desc" placeholder="Caja" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem; background:var(--border);" readonly>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Debe (S/.)</label>
-                      <input type="number" id="v-debe" placeholder="0.00" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem;">
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                      <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">Haber (S/.)</label>
-                      <input type="number" id="v-haber" placeholder="0.00" class="search-input" style="padding:0.4rem; height:auto; font-size:0.75rem;">
-                    </div>
-                    <div style="display:flex; flex-direction:column; justify-content:flex-end;">
-                      <button class="btn-primary" id="btn-add-voucher-row" style="padding:0.4rem; font-size:0.85rem; font-weight:800; height:32px; width:100%; border-radius:6px; display:flex; align-items:center; justify-content:center;">+</button>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Tabla del Asiento -->
-                <div class="voucher-table-wrapper" style="margin-top:0.75rem; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--bg-input);">
-                  <table style="width:100%; border-collapse:collapse; font-size:0.75rem; text-align:left;">
-                    <thead>
-                      <tr style="background:var(--border); font-weight:700; border-bottom:1px solid var(--border);">
-                        <th style="padding:0.4rem 0.5rem;">Cta</th>
-                        <th style="padding:0.4rem 0.5rem;">Nombre Cuenta</th>
-                        <th style="padding:0.4rem 0.5rem; text-align:right; width:65px;">Debe</th>
-                        <th style="padding:0.4rem 0.5rem; text-align:right; width:65px;">Haber</th>
-                        <th style="padding:0.4rem 0.5rem; text-align:center; width:30px;">x</th>
-                      </tr>
-                    </thead>
-                    <tbody id="voucher-rows-container">
-                      <!-- Filas de asiento dinámicas -->
-                    </tbody>
-                    <tfoot>
-                      <tr style="font-weight:700; border-top:1px solid var(--border); background:var(--glass-bg);">
-                        <td colspan="2" style="padding:0.4rem 0.5rem; text-align:right;">Totales:</td>
-                        <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--debe);" id="v-total-debe">S/ 0.00</td>
-                        <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--haber);" id="v-total-haber">S/ 0.00</td>
-                        <td></td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-                
-                <div class="voucher-actions" style="margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:flex-end;">
-                  <button class="btn-secondary" id="btn-clear-voucher" style="font-size:0.75rem; padding:0.4rem 0.75rem;">Limpiar</button>
-                  <button class="btn-primary" id="btn-post-voucher" style="font-size:0.75rem; padding:0.4rem 0.75rem;">Procesar Voucher (Post)</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Panel Balance de Comprobación -->
-          <div class="sub-panel" id="panel-balance">
-            <div class="course-content-scroll" style="padding:0.5rem 1rem;">
-              <div class="results-card" style="margin-top:0; padding:0.75rem 1rem;">
-                <h3 style="font-size:0.95rem; border-bottom:1px solid var(--border); padding-bottom:0.25rem; margin-bottom:0.5rem;">Suma de Saldos</h3>
-                <div style="overflow-x:auto;">
-                  <table class="balance-sheet-table" style="width:100%; border-collapse:collapse; font-size:0.7rem; text-align:left;">
-                    <thead>
-                      <tr style="background:var(--border); font-weight:700; border-bottom:1px solid var(--border);">
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:center;">Cta</th>
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border);">Cuenta Descripción</th>
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Debe</th>
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Haber</th>
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Deudor</th>
-                        <th style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; width:55px;">Acreedor</th>
-                      </tr>
-                    </thead>
-                    <tbody id="balance-sheet-rows">
-                      <!-- Filas acumuladas del balance contable -->
-                    </tbody>
-                    <tfoot>
-                      <tr style="font-weight:700; background:var(--border);">
-                        <td colspan="2" style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">Totales:</td>
-                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sum-debe">S/ 0.00</td>
-                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sum-haber">S/ 0.00</td>
-                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sal-deudor">S/ 0.00</td>
-                        <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;" id="bal-sal-acreedor">S/ 0.00</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-                
-                <button class="btn-secondary" id="btn-reset-balance" style="margin-top:0.75rem; padding:0.35rem 0.75rem; font-size:0.75rem; width:100%;">Borrar Balance y Empezar de Nuevo</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
     </div>
 
     <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV) -->
@@ -845,7 +591,7 @@
       </button>
       <button class="nav-item" id="nav-dinamica" data-screen="dinamica">
         <span class="nav-icon">📊</span>
-        <span>Dinámica NIIF</span>
+        <span>Dinámica - EEFF</span>
       </button>
     </nav>
 

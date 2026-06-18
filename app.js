@@ -39,12 +39,12 @@ const defaultDescriptions = {
   "29": "DESVALORIZACIÓN DE INVENTARIOS",
   "29111": "Mercaderías manufacturadas",
   "33": "PROPIEDAD, PLANTA Y EQUIPO",
-  "3XXX": "PROPIEDAD, PLANTA Y EQUIPO (Por definir)",
+  "3xxx": "PROPIEDAD, PLANTA Y EQUIPO (Por definir)",
   "33411": "Vehículos motorizados - Costo",
   "39": "DEPRECIACIÓN, AMORTIZACIÓN Y AGOTAMIENTO ACUMULADOS",
   "39525": "Vehículos motorizados - Depreciación acumulada",
   "40": "TRIBUTOS, CONTRAPRESTACIONES Y APORTES AL SISTEMA DE PENSIONES Y DE SALUD POR PAGAR",
-  "40XX": "TRIBUTOS POR PAGAR (Por definir)",
+  "40xx": "TRIBUTOS POR PAGAR (Por definir)",
   "40111": "IGV - Cuenta propia",
   "4031": "ESSALUD",
   "4032": "ONP",
@@ -54,7 +54,7 @@ const defaultDescriptions = {
   "42": "CUENTAS POR PAGAR COMERCIALES – TERCEROS",
   "4212": "Emitidas",
   "46": "CUENTAS POR PAGAR DIVERSAS – TERCEROS",
-  "465X": "CUENTAS POR PAGAR DIVERSAS (Por definir)",
+  "465x": "CUENTAS POR PAGAR DIVERSAS (Por definir)",
   "4654": "Propiedad, planta y equipo por pagar",
   "50": "CAPITAL",
   "5011": "Acciones",
@@ -91,7 +91,15 @@ const defaultDescriptions = {
   "791": "Cargas imputables a cuentas de costos y gastos",
   "901": "Costo de Producción",
   "941": "Gastos de Administración",
-  "951": "Gastos de Ventas"
+  "951": "Gastos de Ventas",
+  "6111": "Materias primas",
+  "6131": "Materiales auxiliares",
+  "6141": "Envases y embalajes",
+  "24111": "Materias primas para prod. manufacturados",
+  "251": "Materiales auxiliares",
+  "261": "Envases",
+  "61xx": "Variación de inventarios (Por definir)",
+  "79xx": "Cargas imputables a costos y gastos"
 };
 
 // Función para obtener descripciones dinámicas desde Supabase
@@ -103,7 +111,7 @@ async function getAccountDescription(code) {
     return accountCache[code];
   }
   
-  let desc = defaultDescriptions[code] || "—";
+  let desc = defaultDescriptions[code] || defaultDescriptions[code.toUpperCase()] || defaultDescriptions[code.toLowerCase()] || "—";
   
   try {
     const response = await fetch(
@@ -131,6 +139,165 @@ async function getAccountDescription(code) {
 
 const operations = [
   {
+    id: 1,
+    name: "Asiento de Apertura",
+    description: "Registro inicial de los activos, pasivos y patrimonio con los que la empresa inicia sus operaciones.",
+    inputTemplate: "apertura",
+    defaultValues: {
+      caja: 6800,
+      mercaderias: 1800,
+      suministros: 150,
+      ctasPagar: 2200,
+      capital: 6150,
+      resultados: 400
+    },
+    calculate: (vals) => {
+      const debeTotal = vals.caja + vals.mercaderias + vals.suministros;
+      const haberTotal = vals.ctasPagar + vals.capital + vals.resultados;
+      return {
+        debeTotal,
+        haberTotal,
+        balanced: debeTotal === haberTotal,
+        entries: [
+          { code: "1xxx", type: "debe", value: vals.caja, helper: "Activo disponible y exigible" },
+          { code: "2xxx", type: "debe", value: vals.mercaderias + vals.suministros, helper: "Activo realizable" },
+          { code: "3xxx", type: "debe", value: "", helper: "Activo inmovilizado" },
+          { code: "4xxx", type: "haber", value: vals.ctasPagar, helper: "Pasivo (Obligaciones)" },
+          { code: "5xxx", type: "haber", value: vals.capital + vals.resultados, helper: "Patrimonio (Capital/Resultados)" }
+        ]
+      };
+    }
+  },
+  {
+    id: 2,
+    name: "Aumento de Capital",
+    description: "Registro contable del aumento de capital social de la empresa, cubriendo el acuerdo (suscripción), la entrega de aportes (integración) y la formalización en registros públicos (capitalización).",
+    inputTemplate: "aumento_capital",
+    defaultValues: {
+      total: 200000,
+      efectivo: 80000,
+      bienes: 90000
+    },
+    calculate: (vals) => {
+      const total = vals.total;
+      const efectivo = vals.efectivo;
+      const bienes = vals.bienes;
+      const integrado = efectivo + bienes;
+      
+      const blocks = [
+        {
+          title: "A1. Por el acta de aumento de capital",
+          entries: [
+            { code: "1421", type: "debe", value: total, helper: "Suscripciones por cobrar a socios" },
+            { code: "5221", type: "haber", value: total, helper: "Capital adicional - Aportes" }
+          ]
+        },
+        {
+          title: "A2. Por cobro de aportes por aumento de capital",
+          entries: []
+        },
+        {
+          title: "A3. Por la formalización del aumento de capital mediante Escritura Pública",
+          entries: [
+            { code: "5221", type: "debe", value: integrado, helper: "Capital adicional - Aportes" },
+            { code: "5012", type: "haber", value: integrado, helper: "Capital - Participaciones / Acciones" }
+          ]
+        }
+      ];
+      
+      // Integración: Efectivo
+      if (efectivo > 0) {
+        blocks[1].entries.push({ code: "1xxx", type: "debe", value: efectivo, helper: "Cuentas corrientes operativas" });
+      }
+      // Integración: Bienes/Mercaderías
+      if (bienes > 0) {
+        blocks[1].entries.push({ code: "2xxx", type: "debe", value: bienes, helper: "Mercaderías manufacturadas" });
+      }
+      // Integración: Cuentas por cobrar
+      if (integrado > 0) {
+        blocks[1].entries.push({ code: "1421", type: "haber", value: integrado, helper: "Suscripciones por cobrar a socios" });
+      }
+      
+      return { blocks };
+    }
+  },
+  {
+    id: 3,
+    name: "Constitución de Reservas",
+    description: "Registro de la detracción de utilidades acumuladas para constituir reservas de la empresa (reserva legal, facultativa o estatutaria) conforme a ley o estatutos.",
+    inputTemplate: "reserva",
+    defaultValues: {
+      tipo: "legal",
+      utilidad: 240000,
+      porcentaje: 10,
+      montoFijo: 80000
+    },
+    calculate: (vals) => {
+      const tipo = vals.tipo;
+      const utilidad = vals.utilidad;
+      const porcentaje = vals.porcentaje;
+      const montoFijo = vals.montoFijo;
+      
+      let valor = 0;
+      let haberCode = "58x";
+      let haberHelper = "Reserva por definir";
+      
+      if (tipo === "legal") {
+        valor = utilidad * 0.10;
+        haberHelper = "Reserva Legal";
+      } else if (tipo === "estatutaria") {
+        valor = utilidad * (porcentaje / 100);
+        haberHelper = "Reserva Estatutaria";
+      } else if (tipo === "facultativa") {
+        valor = montoFijo;
+        haberHelper = "Reserva Facultativa";
+      }
+      
+      return {
+        blocks: [
+          {
+            title: "Por la constitución de la reserva",
+            entries: [
+              { code: "5911", type: "debe", value: valor, helper: "Utilidades acumuladas" },
+              { code: haberCode, type: "haber", value: valor, helper: haberHelper }
+            ]
+          }
+        ]
+      };
+    }
+  },
+  {
+    id: 4,
+    name: "Consumo / Envío a producción de activos realizables",
+    description: "Registro del consumo o envío a producción de materias primas, materiales auxiliares, envases y embalajes.",
+    inputTemplate: "consumo_realizables",
+    defaultValues: {
+      tipo: "materias_primas",
+      valor: 15000
+    },
+    calculate: (vals) => {
+      const valor = vals.valor;
+      return {
+        blocks: [
+          {
+            title: "Por el envío a producción / consumo (Naturaleza)",
+            entries: [
+              { code: "61xx", type: "debe", value: valor, helper: "Variación de inventarios" },
+              { code: "2xxx", type: "haber", value: valor, helper: "Activo realizable (Por definir)" }
+            ]
+          },
+          {
+            title: "Por la aplicación al costo (Destino)",
+            entries: [
+              { code: "9xxx", type: "debe", value: valor, helper: "Cuentas de enlace/costos (Por definir)" },
+              { code: "79xx", type: "haber", value: valor, helper: "Cargas imputables a costos y gastos" }
+            ]
+          }
+        ]
+      };
+    }
+  },
+  {
     id: 6,
     name: "Compra de activos inmovilizados (PPE)",
     description: "Adquisición de propiedad, planta y equipo (maquinaria, vehículos, muebles) para uso de la empresa.",
@@ -146,9 +313,9 @@ const operations = [
           {
             title: "Asiento de Naturaleza (Compra de Propiedad, Planta y Equipo)",
             entries: [
-              { code: "3XXX", type: "debe", value: valor, helper: "Propiedad, planta y equipo - Costo" },
-              { code: "40XX", type: "debe", value: igv, helper: "IGV - Crédito Fiscal" },
-              { code: "465X", type: "haber", value: precio, helper: "Cuentas por pagar diversas - Activos" }
+              { code: "3xxx", type: "debe", value: valor, helper: "Propiedad, planta y equipo - Costo" },
+              { code: "40xx", type: "debe", value: igv, helper: "IGV - Crédito Fiscal" },
+              { code: "465x", type: "haber", value: precio, helper: "Cuentas por pagar diversas - Activos" }
             ]
           }
         ]
@@ -160,6 +327,7 @@ const operations = [
 // ===== LÓGICA DE NAVEGACIÓN Y ENRUTADOR =====
 let activeOpId = null;
 let navigationHistory = ["hub"];
+let sessionLedgerBlocks = null;
 
 function navigateTo(screenId) {
   // Ocultar todas las pantallas y quitar animación
@@ -198,25 +366,19 @@ function navigateTo(screenId) {
       showBack = false;
       break;
     case "dinamica":
-      headerTitle = "DINAMICA - NIIF";
+      headerTitle = "DINÁMICA - EEFF";
       break;
     case "op-detail":
       headerTitle = "ASIENTO CONTABLE";
       break;
     case "costos":
-      headerTitle = "GERENCIAL - COSTOS";
-      break;
-    case "tributacion":
-      headerTitle = "TRIBUTACIÓN - LABORAL";
+      headerTitle = "CONTABILIDAD GERENCIAL";
       break;
     case "auditoria":
-      headerTitle = "AUDITORÍA - CTRL INT.";
+      headerTitle = "CONTROL INTERNO";
       break;
     case "logica":
       headerTitle = "PENSAMIENTO LÓGICO";
-      break;
-    case "sistemas":
-      headerTitle = "SISTEMAS CONTABLES";
       break;
   }
   
@@ -262,7 +424,7 @@ function showDinamicaPanel(panelId) {
 // Configurar clicks de botones de navegación
 function setupNavigation() {
   // Botones del Hub de Cursos
-  document.querySelectorAll(".course-card").forEach(card => {
+  document.querySelectorAll(".pwa-card").forEach(card => {
     card.addEventListener("click", () => {
       const screen = card.dataset.screen;
       navigateTo(screen);
@@ -377,8 +539,23 @@ function setupSubTabs() {
   });
 }
 
+// ===== DETECCIÓN DE DISPOSITIVO =====
+function detectDevice() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isMobile = /android|iphone|ipad|ipod|windows phone|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+  
+  if (isMobile) {
+    document.body.classList.add("is-mobile-device");
+    document.body.classList.remove("is-pc-device");
+  } else {
+    document.body.classList.add("is-pc-device");
+    document.body.classList.remove("is-mobile-device");
+  }
+}
+
 // ===== INICIO DE LA APLICACIÓN =====
 document.addEventListener("DOMContentLoaded", () => {
+  detectDevice();
   setupTheme();
   setupNavigation();
   setupSubTabs();
@@ -390,10 +567,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Inicialización de nuevos módulos de cursos
   setupCostosModule();
-  setupTributacionModule();
   setupAuditoriaModule();
   setupLogicaModule();
-  setupSistemasModule();
   
   // Por defecto ir al portal CERTUS CONTAPEDIA (Hub)
   navigateTo("hub");
@@ -465,6 +640,7 @@ function selectOperation(id) {
   const op = operations.find(o => o.id === id);
   if (!op) return;
   
+  sessionLedgerBlocks = null; // Reiniciar estado temporal del asiento al cambiar de operación
   renderInputs(op);
   updateLedger(op);
 }
@@ -495,6 +671,113 @@ function renderInputs(op) {
       group.querySelector("input").addEventListener("input", () => updateLedger(op));
     });
     
+  } else if (op.inputTemplate === "aumento_capital") {
+    inputsContainer.innerHTML = `
+      <div class="input-group">
+        <label for="input-total">Monto Total Acordado (S/)</label>
+        <input type="number" id="input-total" class="calc-input" value="${op.defaultValues.total}" min="0">
+      </div>
+      <div class="input-group">
+        <label for="input-efectivo">Aporte en Efectivo (S/)</label>
+        <input type="number" id="input-efectivo" class="calc-input" value="${op.defaultValues.efectivo}" min="0">
+      </div>
+      <div class="input-group">
+        <label for="input-bienes">Aporte en Bienes/Mercaderías (S/)</label>
+        <input type="number" id="input-bienes" class="calc-input" value="${op.defaultValues.bienes}" min="0">
+      </div>
+    `;
+    inputsContainer.querySelectorAll("input").forEach(el => {
+      el.addEventListener("input", () => updateLedger(op));
+    });
+
+  } else if (op.inputTemplate === "reserva") {
+    inputsContainer.innerHTML = `
+      <div class="input-group">
+        <label for="input-tipo">Tipo de Reserva</label>
+        <select id="input-tipo" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="legal" ${op.defaultValues.tipo === 'legal' ? 'selected' : ''}>Reserva Legal (10% Ley de Sociedades)</option>
+          <option value="facultativa" ${op.defaultValues.tipo === 'facultativa' ? 'selected' : ''}>Reserva Facultativa (Acuerdo Socios)</option>
+          <option value="estatutaria" ${op.defaultValues.tipo === 'estatutaria' ? 'selected' : ''}>Reserva Estatutaria (Estatuto)</option>
+        </select>
+      </div>
+      <div class="input-group" id="group-utilidad">
+        <label for="input-utilidad">Utilidad Neta del Ejercicio (S/)</label>
+        <input type="number" id="input-utilidad" class="calc-input" value="${op.defaultValues.utilidad}" min="0">
+      </div>
+      <div class="input-group" id="group-porcentaje" style="display: none;">
+        <label for="input-porcentaje">Porcentaje de Reserva (%)</label>
+        <input type="number" id="input-porcentaje" class="calc-input" value="${op.defaultValues.porcentaje}" min="0">
+      </div>
+      <div class="input-group" id="group-montoFijo" style="display: none;">
+        <label for="input-montoFijo">Monto de Reserva (S/)</label>
+        <input type="number" id="input-montoFijo" class="calc-input" value="${op.defaultValues.montoFijo}" min="0">
+      </div>
+    `;
+    
+    const tipoSelect = document.getElementById("input-tipo");
+    const groupUtilidad = document.getElementById("group-utilidad");
+    const groupPorcentaje = document.getElementById("group-porcentaje");
+    const groupMontoFijo = document.getElementById("group-montoFijo");
+    
+    const toggleGroups = () => {
+      const val = tipoSelect.value;
+      if (val === "legal") {
+        groupUtilidad.style.display = "block";
+        groupPorcentaje.style.display = "none";
+        groupMontoFijo.style.display = "none";
+      } else if (val === "estatutaria") {
+        groupUtilidad.style.display = "block";
+        groupPorcentaje.style.display = "block";
+        groupMontoFijo.style.display = "none";
+      } else if (val === "facultativa") {
+        groupUtilidad.style.display = "none";
+        groupPorcentaje.style.display = "none";
+        groupMontoFijo.style.display = "block";
+      }
+    };
+    
+    tipoSelect.addEventListener("change", toggleGroups);
+    toggleGroups();
+    
+    inputsContainer.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("input", () => updateLedger(op));
+    });
+
+  } else if (op.inputTemplate === "consumo_realizables") {
+    inputsContainer.innerHTML = `
+      <div class="input-group">
+        <label for="input-tipo">Tipo de Activo Realizable</label>
+        <select id="input-tipo" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="materias_primas" ${op.defaultValues.tipo === 'materias_primas' ? 'selected' : ''}>Materias Primas (C-6111 / A-24111)</option>
+          <option value="envases" ${op.defaultValues.tipo === 'envases' ? 'selected' : ''}>Envases y Embalajes (C-6141 / A-261)</option>
+          <option value="materiales" ${op.defaultValues.tipo === 'materiales' ? 'selected' : ''}>Materiales Auxiliares (C-6131 / A-251)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="input-valor">Valor del Consumo / Envío (S/)</label>
+        <input type="number" id="input-valor" class="calc-input" value="${op.defaultValues.valor}" min="0">
+      </div>
+    `;
+    
+    const tipoSelect = document.getElementById("input-tipo");
+    const valorInp = document.getElementById("input-valor");
+    
+    tipoSelect.addEventListener("change", () => {
+      const val = tipoSelect.value;
+      if (val === "materias_primas") {
+        valorInp.value = 15000;
+      } else if (val === "envases") {
+        valorInp.value = 9200;
+      } else if (val === "materiales") {
+        valorInp.value = 6800;
+      }
+      updateLedger(op);
+    });
+    
+    inputsContainer.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("input", () => updateLedger(op));
+    });
+
   } else if (op.inputTemplate === "compra_almacenada") {
     inputsContainer.innerHTML = `
       <div class="input-group">
@@ -701,10 +984,28 @@ function getValuesFromInputs(op) {
       capital: Number(document.getElementById("input-capital").value) || 0,
       resultados: Number(document.getElementById("input-resultados").value) || 0
     };
+  } else if (op.inputTemplate === "aumento_capital") {
+    return {
+      total: Number(document.getElementById("input-total").value) || 0,
+      efectivo: Number(document.getElementById("input-efectivo").value) || 0,
+      bienes: Number(document.getElementById("input-bienes").value) || 0
+    };
+  } else if (op.inputTemplate === "reserva") {
+    return {
+      tipo: document.getElementById("input-tipo").value,
+      utilidad: Number(document.getElementById("input-utilidad").value) || 0,
+      porcentaje: Number(document.getElementById("input-porcentaje").value) || 0,
+      montoFijo: Number(document.getElementById("input-montoFijo").value) || 0
+    };
   } else if (op.inputTemplate === "compra_almacenada") {
     return {
       valor: Number(document.getElementById("input-valor").value) || 0,
       tipo: document.getElementById("input-tipo").value
+    };
+  } else if (op.inputTemplate === "consumo_realizables") {
+    return {
+      tipo: document.getElementById("input-tipo").value,
+      valor: Number(document.getElementById("input-valor").value) || 0
     };
   } else if (op.inputTemplate === "consumo_activos") {
     return {
@@ -773,21 +1074,51 @@ async function updateLedger(op) {
   // Resumen Dinámico Horizontal
   renderSummary(op, inputs);
   
+  // Inicializar o actualizar sessionLedgerBlocks
+  const newBlocks = op.inputTemplate === "apertura"
+    ? [{ title: "Asiento de Apertura Inicial", entries: calculations.entries }]
+    : calculations.blocks;
+    
+  if (!sessionLedgerBlocks) {
+    sessionLedgerBlocks = newBlocks.map(b => ({
+      title: b.title,
+      entries: b.entries.map(e => ({
+        code: e.code,
+        type: e.type,
+        value: e.value,
+        helper: e.helper,
+        isCustom: false,
+        codeEdited: false,
+        valueEdited: false
+      }))
+    }));
+  } else {
+    // Si ya existe, actualizamos los valores de las filas predeterminadas
+    newBlocks.forEach((newBlock, bIdx) => {
+      const sessionBlock = sessionLedgerBlocks[bIdx];
+      if (!sessionBlock) return;
+      
+      const defaultSessionEntries = sessionBlock.entries.filter(e => !e.isCustom);
+      newBlock.entries.forEach((newEntry, eIdx) => {
+        if (defaultSessionEntries[eIdx]) {
+          if (!defaultSessionEntries[eIdx].valueEdited) {
+            defaultSessionEntries[eIdx].value = newEntry.value;
+          }
+          if (!defaultSessionEntries[eIdx].codeEdited) {
+            defaultSessionEntries[eIdx].code = newEntry.code;
+          }
+        }
+      });
+    });
+  }
+  
   const ledgerView = document.getElementById("ledger-view");
   ledgerView.innerHTML = "";
   
-  if (op.inputTemplate === "apertura") {
-    const block = {
-      title: "Asiento de Apertura Inicial",
-      entries: calculations.entries
-    };
-    await renderLedgerBlock(block, ledgerView, 0);
-  } else {
-    let blockIdx = 0;
-    for (const block of calculations.blocks) {
-      await renderLedgerBlock(block, ledgerView, blockIdx);
-      blockIdx++;
-    }
+  let blockIdx = 0;
+  for (const block of sessionLedgerBlocks) {
+    await renderLedgerBlock(block, ledgerView, blockIdx, op);
+    blockIdx++;
   }
 }
 
@@ -813,6 +1144,43 @@ function renderSummary(op, inputs) {
     sumVal3.textContent = balanced ? "OK" : "Error";
     sumVal3.style.color = balanced ? "var(--primary)" : "var(--haber)";
     
+  } else if (op.inputTemplate === "aumento_capital") {
+    const total = inputs.total || 0;
+    const integrado = (inputs.efectivo || 0) + (inputs.bienes || 0);
+    const pendiente = Math.max(0, total - integrado);
+    
+    label1.textContent = "Acordado";
+    sumVal1.textContent = formatter.format(total);
+    label2.textContent = "Integrado";
+    sumVal2.textContent = formatter.format(integrado);
+    label3.textContent = "Pendiente";
+    sumVal3.textContent = formatter.format(pendiente);
+    sumVal3.style.color = pendiente > 0 ? "var(--haber)" : "var(--primary)";
+
+  } else if (op.inputTemplate === "reserva") {
+    const tipo = inputs.tipo;
+    let base = 0;
+    let calcVal = 0;
+    
+    if (tipo === "legal") {
+      base = inputs.utilidad || 0;
+      calcVal = base * 0.10;
+    } else if (tipo === "estatutaria") {
+      base = inputs.utilidad || 0;
+      calcVal = base * ((inputs.porcentaje || 0) / 100);
+    } else if (tipo === "facultativa") {
+      base = inputs.montoFijo || 0;
+      calcVal = base;
+    }
+    
+    label1.textContent = "Utilidad/Base";
+    sumVal1.textContent = formatter.format(base);
+    label2.textContent = "Detracción";
+    sumVal2.textContent = tipo === "legal" ? "10%" : (tipo === "estatutaria" ? `${inputs.porcentaje}%` : "Monto Fijo");
+    label3.textContent = "Total Reserva";
+    sumVal3.textContent = formatter.format(calcVal);
+    sumVal3.style.color = "var(--primary)";
+
   } else if (op.inputTemplate === "compra_almacenada" || op.inputTemplate === "compra_inmediata" || op.inputTemplate === "gastos_servicios" || op.inputTemplate === "compra_ppe") {
     const valor = inputs.valor || 0;
     const igv = valor * 0.18;
@@ -884,17 +1252,66 @@ function formatCodeWithTemplate(val, template) {
     }
   }
   
-  // Si tiene menos caracteres que la plantilla, rellenar con 'X'
+  // Si tiene menos caracteres que la plantilla, rellenar con 'x'/'X'
   if (digits.length < templateLength) {
-    return digits + 'X'.repeat(templateLength - digits.length);
+    const isUpper = /[X]/.test(template);
+    const charToRepeat = isUpper ? 'X' : 'x';
+    return digits + charToRepeat.repeat(templateLength - digits.length);
   }
   
   // Si es igual o mayor longitud, dejar el número tal como está
   return digits;
 }
 
+// Función para actualizar la descripción en tiempo real
+async function updateRealtimeDescription(code, descSpan) {
+  if (!descSpan) return;
+  const cleanCode = code.replace(/X/gi, '').trim();
+  
+  if (cleanCode.length === 0) {
+    descSpan.textContent = "—";
+    return;
+  }
+  
+  if (cleanCode.length === 1) {
+    descSpan.textContent = getElementoName(cleanCode);
+    return;
+  }
+  
+  if (accountCache[cleanCode]) {
+    descSpan.textContent = accountCache[cleanCode];
+    return;
+  }
+  
+  let desc = defaultDescriptions[cleanCode] || defaultDescriptions[cleanCode.toUpperCase()] || defaultDescriptions[cleanCode.toLowerCase()] || "—";
+  descSpan.textContent = desc;
+  
+  if (cleanCode.length >= 2) {
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=eq.${cleanCode}&select=descripcion`,
+        {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          descSpan.textContent = data[0].descripcion;
+          accountCache[cleanCode] = data[0].descripcion;
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+}
+
 // Pintar un bloque de asiento en formato de tabla clásica contable
-async function renderLedgerBlock(block, container, blockIdx = 0) {
+async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
   const blockDiv = document.createElement("div");
   blockDiv.className = "ledger-block";
   
@@ -903,20 +1320,48 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
     <table class="ledger-table">
       <thead>
         <tr>
-          <th style="width: 22%;">CODIGO</th>
-          <th style="width: 48%;">DENOMINACION</th>
+          <th style="width: 20%;">CODIGO</th>
+          <th style="width: 45%;">DENOMINACION</th>
           <th style="width: 15%;">DEBE</th>
           <th style="width: 15%;">HABER</th>
+          <th style="width: 5%;"></th>
         </tr>
       </thead>
       <tbody class="ledger-rows-container"></tbody>
+      <tfoot>
+        <tr style="border-top: 2px solid var(--border); font-weight: 700;">
+          <td colspan="2" style="text-align: right; padding: 0.5rem 0.75rem;">Total:</td>
+          <td class="ledger-total-debe center" style="color: var(--debe); padding: 0.5rem 0.75rem;">S/ 0.00</td>
+          <td class="ledger-total-haber center" style="color: var(--haber); padding: 0.5rem 0.75rem;">S/ 0.00</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="5" class="ledger-balance-status center" style="padding: 0.5rem; font-size: 0.85rem; font-weight: bold; border-radius: 8px; text-align: center; line-height: 1.5;">
+            <!-- Estado de balance -->
+          </td>
+        </tr>
+      </tfoot>
     </table>
   `;
   
   const rowsContainer = blockDiv.querySelector(".ledger-rows-container");
   
+  function createDividerRow(bIdx, insertIdx) {
+    const tr = document.createElement("tr");
+    tr.className = "add-row-tr";
+    tr.innerHTML = `
+      <td colspan="5">
+        <div class="add-row-divider">
+          <button class="btn-add-row" data-block-idx="${bIdx}" data-insert-idx="${insertIdx}" type="button" title="Insertar Fila">+</button>
+        </div>
+      </td>
+    `;
+    return tr;
+  }
+  
   // Función interna para determinar el texto del placeholder contable
   function getPlaceholderText(code, type) {
+    if (!code) return "";
     const cleanCode = code.replace(/X/gi, '');
     if (cleanCode.startsWith("3") || cleanCode.startsWith("60")) {
       return type === "debe" ? "VC" : "";
@@ -936,21 +1381,23 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
     return "";
   }
   
+  // Limpiar e inicializar tbody con el divisor inicial
+  rowsContainer.innerHTML = "";
+  rowsContainer.appendChild(createDividerRow(blockIdx, 0));
+  
   for (let entryIdx = 0; entryIdx < block.entries.length; entryIdx++) {
     const entry = block.entries[entryIdx];
-    const slotKey = `${activeOpId}_${blockIdx}_${entryIdx}`;
-    const code = userCustomCodes[slotKey] || entry.code;
+    const code = entry.code || "";
     const officialDesc = await getAccountDescription(code);
     
     const tr = document.createElement("tr");
     
-    const debeCell = entry.type === "debe" 
-      ? `<input type="text" class="ledger-amount-input" data-op-id="${activeOpId}" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="debe" placeholder="${getPlaceholderText(code, "debe")}" value="${userCustomAmounts[`${activeOpId}_${blockIdx}_${entryIdx}_debe`] || ''}">` 
-      : "";
-      
-    const haberCell = entry.type === "haber" 
-      ? `<input type="text" class="ledger-amount-input" data-op-id="${activeOpId}" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="haber" placeholder="${getPlaceholderText(code, "haber")}" value="${userCustomAmounts[`${activeOpId}_${blockIdx}_${entryIdx}_haber`] || ''}">` 
-      : "";
+    // Renderizamos inputs en ambas columnas (Debe y Haber) para todas las filas
+    const debeValue = (entry.type === "debe" && entry.value !== undefined && entry.value !== null) ? entry.value : "";
+    const haberValue = (entry.type === "haber" && entry.value !== undefined && entry.value !== null) ? entry.value : "";
+    
+    const debeCell = `<input type="number" class="ledger-amount-input" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="debe" placeholder="${getPlaceholderText(code, "debe")}" value="${debeValue}">`;
+    const haberCell = `<input type="number" class="ledger-amount-input" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="haber" placeholder="${getPlaceholderText(code, "haber")}" value="${haberValue}">`;
     
     tr.innerHTML = `
       <td class="center">
@@ -959,7 +1406,6 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
             type="text" 
             class="ledger-code-input" 
             value="${code}" 
-            data-op-id="${activeOpId}"
             data-block-idx="${blockIdx}"
             data-entry-idx="${entryIdx}" 
             autocomplete="off"
@@ -977,9 +1423,15 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       <td class="center" style="font-size: 0.85rem; font-weight: 700; color: var(--haber);">
         ${haberCell}
       </td>
+      <td class="center">
+        <button class="btn-delete-row" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" type="button" title="Eliminar fila" style="background: none; border: none; color: var(--haber); font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: background 0.2s;">&times;</button>
+      </td>
     `;
     
     rowsContainer.appendChild(tr);
+    
+    // Renderizar divisor después de la fila
+    rowsContainer.appendChild(createDividerRow(blockIdx, entryIdx + 1));
   }
   
   container.appendChild(blockDiv);
@@ -987,14 +1439,9 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
   // Vincular autocompletado Supabase
   const codeInputs = blockDiv.querySelectorAll(".ledger-code-input");
   codeInputs.forEach(input => {
-    const opId = Number(input.dataset.opId);
     const bIdx = Number(input.dataset.blockIdx);
     const eIdx = Number(input.dataset.entryIdx);
     const suggestionsList = input.nextElementSibling;
-    
-    const originalTemplate = block.entries[eIdx].code;
-    const isTemplate = /[Xx]/.test(originalTemplate);
-    const prefix = isTemplate ? originalTemplate.split(/[Xx]/)[0] : "";
     
     let debounceTimer = null;
     
@@ -1002,27 +1449,29 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       let val = e.target.value;
       clearTimeout(debounceTimer);
       
-      if (isTemplate) {
-        const digits = val.replace(/[^0-9]/g, '');
-        const finalDigits = digits.startsWith(prefix) ? digits : prefix;
-        const formatted = formatCodeWithTemplate(val, originalTemplate);
-        
-        if (input.value !== formatted) {
-          input.value = formatted;
-        }
-        
-        const cursorPosition = finalDigits.length;
-        input.setSelectionRange(cursorPosition, cursorPosition);
-        
-        val = formatted;
+      // Permitir cualquier dígito ingresado, sin forzar formato template
+      const digits = val.replace(/[^0-9]/g, '');
+      if (input.value !== digits) {
+        input.value = digits;
       }
+      val = digits;
       
-      const slotKey = `${opId}_${bIdx}_${eIdx}`;
-      userCustomCodes[slotKey] = val;
+      const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
+      entry.code = val;
+      entry.codeEdited = true;
       
-      const cleanQuery = isTemplate ? val.replace(/[^0-9]/g, '') : val.trim();
+      // Actualizar descripción en tiempo real
+      const descSpan = input.closest('tr').querySelector('.desc-official');
+      updateRealtimeDescription(val, descSpan);
       
-      if (cleanQuery.length < 1) {
+      // Actualizar placeholders dinámicamente
+      const tr = input.closest('tr');
+      const debeInp = tr.querySelector('.ledger-amount-input[data-type="debe"]');
+      const haberInp = tr.querySelector('.ledger-amount-input[data-type="haber"]');
+      if (debeInp) debeInp.placeholder = getPlaceholderText(val, "debe");
+      if (haberInp) haberInp.placeholder = getPlaceholderText(val, "haber");
+      
+      if (val.length < 1) {
         suggestionsList.classList.remove("show");
         return;
       }
@@ -1030,7 +1479,7 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       debounceTimer = setTimeout(async () => {
         try {
           const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=like.${cleanQuery}*&nivel=eq.${cleanQuery.length + 1}&limit=15&order=codigo.asc`,
+            `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=like.${val}*&nivel=eq.${val.length + 1}&limit=15&order=codigo.asc`,
             {
               headers: {
                 "apikey": SUPABASE_KEY,
@@ -1040,7 +1489,7 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
           );
           if (response.ok) {
             const data = await response.json();
-            renderSuggestions(data, input, suggestionsList, opId, bIdx, eIdx);
+            renderSuggestions(data, input, suggestionsList, bIdx, eIdx);
           }
         } catch (error) {
           console.error("Error al consultar autocompletado:", error);
@@ -1054,28 +1503,17 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
       }, 250);
     });
     
-    if (isTemplate) {
-      const snapCursor = () => {
-        const digits = input.value.replace(/[^0-9]/g, '');
-        const finalDigits = digits.startsWith(prefix) ? digits : prefix;
-        const cursorPosition = finalDigits.length;
-        input.setSelectionRange(cursorPosition, cursorPosition);
-      };
-      
-      input.addEventListener("focus", () => {
-        setTimeout(snapCursor, 0);
+    input.addEventListener("focus", () => {
+      let val = input.value.trim();
+      if (/[Xx]/.test(val)) {
+        // Remover X's al hacer foco para permitir escribir cómodamente
+        const newVal = val.replace(/X/gi, '');
+        input.value = newVal;
         input.dispatchEvent(new Event("input"));
-      });
-      
-      input.addEventListener("click", snapCursor);
-    } else {
-      input.addEventListener("focus", () => {
-        const val = input.value.trim();
-        if (val.length > 0) {
-          input.dispatchEvent(new Event("input"));
-        }
-      });
-    }
+      } else {
+        input.dispatchEvent(new Event("input"));
+      }
+    });
  
     input.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -1089,59 +1527,163 @@ async function renderLedgerBlock(block, container, blockIdx = 0) {
   amountInputs.forEach(input => {
     input.addEventListener("input", (e) => {
       const val = e.target.value;
-      const opId = Number(input.dataset.opId);
       const bIdx = Number(input.dataset.blockIdx);
       const eIdx = Number(input.dataset.entryIdx);
       const type = input.dataset.type;
       
-      const slotKey = `${opId}_${bIdx}_${eIdx}_${type}`;
-      userCustomAmounts[slotKey] = val;
+      const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
+      entry.valueEdited = true;
+      
+      if (val === "") {
+        entry.value = "";
+      } else {
+        entry.type = type;
+        entry.value = parseFloat(val) || 0;
+        
+        // Limpiar la columna opuesta en el DOM y en el estado
+        const oppType = type === "debe" ? "haber" : "debe";
+        const oppInput = blockDiv.querySelector(`.ledger-amount-input[data-block-idx="${bIdx}"][data-entry-idx="${eIdx}"][data-type="${oppType}"]`);
+        if (oppInput) {
+          oppInput.value = "";
+        }
+      }
+      
+      // Recalcular totales en tiempo real
+      recalculateTotals();
     });
   });
-}
 
-// Renderizar las sugerencias flotantes del ledger
-function renderSuggestions(data, input, suggestionsList, opId, bIdx, eIdx) {
-  suggestionsList.innerHTML = "";
-  
-  if (!data || data.length === 0) {
-    suggestionsList.classList.remove("show");
-    return;
-  }
-  
-  data.forEach(item => {
-    const btn = document.createElement("button");
-    btn.className = "suggestion-item";
-    btn.type = "button";
-    btn.innerHTML = `
-      <span class="sugg-code" style="font-weight: 700; color: var(--primary); flex-shrink: 0; margin-right: 0.5rem;">${item.codigo}</span>
-      <span class="sugg-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;" title="${item.descripcion}">${item.descripcion}</span>
-    `;
-    
-    btn.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-    });
-    
-    btn.addEventListener("click", async () => {
-      const selectedCode = item.codigo;
-      input.value = selectedCode;
-      suggestionsList.classList.remove("show");
+  // Vincular eliminación de fila
+  const deleteButtons = blockDiv.querySelectorAll(".btn-delete-row");
+  deleteButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const bIdx = Number(btn.dataset.blockIdx);
+      const eIdx = Number(btn.dataset.entryIdx);
       
-      const slotKey = `${opId}_${bIdx}_${eIdx}`;
-      userCustomCodes[slotKey] = selectedCode;
+      // Remover la fila de los datos de la sesión
+      sessionLedgerBlocks[bIdx].entries.splice(eIdx, 1);
       
-      accountCache[selectedCode] = item.descripcion;
-      
-      const op = operations.find(o => o.id === opId);
+      // Re-renderizar
       if (op) {
-        await updateLedger(op);
+        updateLedger(op);
+      }
+    });
+  });
+
+  // Vincular adición de fila (múltiples botones de inserción)
+  const addButtons = blockDiv.querySelectorAll(".btn-add-row");
+  addButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const bIdx = Number(btn.dataset.blockIdx);
+      const insertIdx = Number(btn.dataset.insertIdx);
+      
+      // Insertar una nueva fila en la posición deseada
+      sessionLedgerBlocks[bIdx].entries.splice(insertIdx, 0, {
+        code: "",
+        type: "debe",
+        value: "",
+        helper: "Cuenta adicional",
+        isCustom: true
+      });
+      
+      // Re-renderizar
+      if (op) {
+        updateLedger(op);
+      }
+    });
+  });
+
+  // Función interna para recalcular totales del bloque en tiempo real
+  function recalculateTotals() {
+    let totalDebe = 0;
+    let totalHaber = 0;
+    
+    blockDiv.querySelectorAll(".ledger-amount-input").forEach(inp => {
+      const val = parseFloat(inp.value) || 0;
+      if (inp.dataset.type === "debe") {
+        totalDebe += val;
+      } else if (inp.dataset.type === "haber") {
+        totalHaber += val;
       }
     });
     
-    suggestionsList.appendChild(btn);
-  });
-  
-  suggestionsList.classList.add("show");
+    const totalDebeEl = blockDiv.querySelector(".ledger-total-debe");
+    const totalHaberEl = blockDiv.querySelector(".ledger-total-haber");
+    const balanceStatusEl = blockDiv.querySelector(".ledger-balance-status");
+    
+    const formatter = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
+    
+    if (totalDebeEl) totalDebeEl.textContent = formatter.format(totalDebe);
+    if (totalHaberEl) totalHaberEl.textContent = formatter.format(totalHaber);
+    
+    if (balanceStatusEl) {
+      const diff = Math.abs(totalDebe - totalHaber);
+      if (diff < 0.01) {
+        balanceStatusEl.textContent = "✔ OK (Cuadrado)";
+        balanceStatusEl.style.color = "#22c55e";
+        balanceStatusEl.style.backgroundColor = "rgba(34, 197, 94, 0.1)";
+      } else {
+        balanceStatusEl.textContent = `⚠ Desbalance: ${formatter.format(diff)}`;
+        balanceStatusEl.style.color = "#ef4444";
+        balanceStatusEl.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+      }
+    }
+  }
+
+  // Renderizar las sugerencias flotantes del ledger
+  function renderSuggestions(data, input, suggestionsList, bIdx, eIdx) {
+    suggestionsList.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+      suggestionsList.classList.remove("show");
+      return;
+    }
+    
+    data.forEach(item => {
+      const btn = document.createElement("button");
+      btn.className = "suggestion-item";
+      btn.type = "button";
+      btn.innerHTML = `
+        <span class="sugg-code" style="font-weight: 700; color: var(--primary); flex-shrink: 0; margin-right: 0.5rem;">${item.codigo}</span>
+        <span class="sugg-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;" title="${item.descripcion}">${item.descripcion}</span>
+      `;
+      
+      btn.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+      });
+      
+      btn.addEventListener("click", async () => {
+        const selectedCode = item.codigo;
+        input.value = selectedCode;
+        suggestionsList.classList.remove("show");
+        
+        const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
+        entry.code = selectedCode;
+        entry.codeEdited = true;
+        
+        accountCache[selectedCode] = item.descripcion;
+        
+        const descSpan = input.closest('tr').querySelector('.desc-official');
+        if (descSpan) descSpan.textContent = item.descripcion;
+        
+        // Actualizar placeholders dinámicamente al seleccionar código
+        const tr = input.closest('tr');
+        const debeInp = tr.querySelector('.ledger-amount-input[data-type="debe"]');
+        const haberInp = tr.querySelector('.ledger-amount-input[data-type="haber"]');
+        if (debeInp) debeInp.placeholder = getPlaceholderText(selectedCode, "debe");
+        if (haberInp) haberInp.placeholder = getPlaceholderText(selectedCode, "haber");
+        
+        recalculateTotals();
+      });
+      
+      suggestionsList.appendChild(btn);
+    });
+    
+    suggestionsList.classList.add("show");
+  }
+
+  // Ejecutar recálculo inicial
+  recalculateTotals();
 }
 
 // ===== SISTEMA EXPLORADOR PCGE JERÁRQUICO (PANTALLA 3) =====
@@ -1554,91 +2096,7 @@ function setupCostosModule() {
   });
 }
 
-// ----- 2. TRIBUTACIÓN - LABORAL -----
-function setupTributacionModule() {
-  // Planilla
-  const btnPlanilla = document.getElementById("btn-calc-planilla");
-  if (btnPlanilla) {
-    btnPlanilla.addEventListener("click", () => {
-      const sueldo = parseFloat(document.getElementById("sueldo-basico").value) || 0;
-      const asigFamChecked = document.getElementById("asig-familiar").checked;
-      const asigFamVal = asigFamChecked ? 102.50 : 0;
-      const totalRem = sueldo + asigFamVal;
-      
-      const system = document.getElementById("regimen-pension").value;
-      let pensionRate = 0.13;
-      let pensionName = "ONP";
-      
-      if (system === "afp-integra") {
-        pensionRate = 0.128;
-        pensionName = "AFP Integra";
-      } else if (system === "afp-prima") {
-        pensionRate = 0.129;
-        pensionName = "AFP Prima";
-      } else if (system === "afp-profuturo") {
-        pensionRate = 0.130;
-        pensionName = "AFP Profuturo";
-      }
-      
-      const pensionVal = totalRem * pensionRate;
-      const neto = totalRem - pensionVal;
-      const essalud = totalRem * 0.09;
-      
-      const grati = totalRem / 6;
-      const cts = (totalRem + grati) / 12;
-      const vac = totalRem / 12;
-      
-      document.getElementById("bol-basico").textContent = `S/ ${sueldo.toFixed(2)}`;
-      document.getElementById("bol-asig").textContent = `S/ ${asigFamVal.toFixed(2)}`;
-      document.getElementById("bol-total-rem").textContent = `S/ ${totalRem.toFixed(2)}`;
-      document.getElementById("bol-pension-lbl").textContent = pensionName;
-      document.getElementById("bol-pension-val").textContent = `-S/ ${pensionVal.toFixed(2)}`;
-      document.getElementById("bol-neto").textContent = `S/ ${neto.toFixed(2)}`;
-      document.getElementById("bol-essalud").textContent = `S/ ${essalud.toFixed(2)}`;
-      document.getElementById("bol-grati").textContent = `S/ ${grati.toFixed(2)}`;
-      document.getElementById("bol-cts").textContent = `S/ ${cts.toFixed(2)}`;
-      document.getElementById("bol-vacaciones").textContent = `S/ ${vac.toFixed(2)}`;
-      
-      document.getElementById("planilla-results").style.display = "block";
-    });
-  }
-  
-  // IGV y detracciones
-  const btnTributos = document.getElementById("btn-calc-tributos");
-  if (btnTributos) {
-    btnTributos.addEventListener("click", () => {
-      const monto = parseFloat(document.getElementById("monto-operacion").value) || 0;
-      const tipo = document.getElementById("tipo-monto").value;
-      const tasaDet = parseFloat(document.getElementById("tasa-detraccion").value) || 0;
-      
-      let base = 0;
-      let igv = 0;
-      let total = 0;
-      
-      if (tipo === "base") {
-        base = monto;
-        igv = base * 0.18;
-        total = base + igv;
-      } else {
-        total = monto;
-        base = total / 1.18;
-        igv = total - base;
-      }
-      
-      const det = total * tasaDet;
-      const neto = total - det;
-      
-      document.getElementById("trib-base").textContent = `S/ ${base.toFixed(2)}`;
-      document.getElementById("trib-igv").textContent = `S/ ${igv.toFixed(2)}`;
-      document.getElementById("trib-total").textContent = `S/ ${total.toFixed(2)}`;
-      document.getElementById("trib-det-pct").textContent = `${(tasaDet * 100).toFixed(0)}%`;
-      document.getElementById("trib-det-val").textContent = `S/ ${det.toFixed(2)}`;
-      document.getElementById("trib-neto-pagar").textContent = `S/ ${neto.toFixed(2)}`;
-      
-      document.getElementById("tributos-results").style.display = "block";
-    });
-  }
-}
+// MODULO ELIMINADO: TRIBUTACION
 
 // ----- 3. AUDITORÍA Y CONTROL INTERNO -----
 const risksData = [
@@ -1939,209 +2397,4 @@ function loadChallenge(idx) {
   });
 }
 
-// ----- 5. SISTEMAS CONTABLES -----
-let voucherRows = [];
-let postedVouchers = [];
-
-function setupSistemasModule() {
-  const accountInput = document.getElementById("v-cuenta");
-  const descInput = document.getElementById("v-desc");
-  const debeInput = document.getElementById("v-debe");
-  const haberInput = document.getElementById("v-haber");
-  const addBtn = document.getElementById("btn-add-voucher-row");
-  
-  if (!accountInput) return;
-  
-  accountInput.addEventListener("input", async (e) => {
-    const code = e.target.value.trim();
-    if (code.length >= 2) {
-      const desc = await getAccountDescription(code);
-      descInput.value = desc !== "—" ? desc : "Cuenta no encontrada";
-    } else {
-      descInput.value = "";
-    }
-  });
-  
-  debeInput.addEventListener("input", () => {
-    if (debeInput.value) haberInput.value = "";
-  });
-  
-  haberInput.addEventListener("input", () => {
-    if (haberInput.value) debeInput.value = "";
-  });
-  
-  addBtn.addEventListener("click", () => {
-    const code = accountInput.value.trim();
-    const desc = descInput.value.trim();
-    const debeVal = parseFloat(debeInput.value) || 0;
-    const haberVal = parseFloat(haberInput.value) || 0;
-    
-    if (!code || desc === "Cuenta no encontrada" || desc === "") {
-      showToast("Ingresa un código de cuenta válido del PCGE.", "error");
-      return;
-    }
-    
-    if (debeVal <= 0 && haberVal <= 0) {
-      showToast("Debes ingresar un importe en el Debe o en el Haber.", "error");
-      return;
-    }
-    
-    voucherRows.push({ code, desc, debe: debeVal, haber: haberVal });
-    
-    accountInput.value = "";
-    descInput.value = "";
-    debeInput.value = "";
-    haberInput.value = "";
-    
-    renderVoucherTable();
-  });
-  
-  document.getElementById("btn-clear-voucher").addEventListener("click", () => {
-    voucherRows = [];
-    renderVoucherTable();
-  });
-  
-  document.getElementById("btn-post-voucher").addEventListener("click", () => {
-    if (voucherRows.length === 0) {
-      showToast("El voucher está vacío.", "error");
-      return;
-    }
-    
-    let totalDebe = 0;
-    let totalHaber = 0;
-    voucherRows.forEach(r => {
-      totalDebe += r.debe;
-      totalHaber += r.haber;
-    });
-    
-    if (Math.abs(totalDebe - totalHaber) > 0.01) {
-      showToast(`¡Asiento descuadrado! Debe cuadrar partida doble por S/ ${Math.abs(totalDebe - totalHaber).toFixed(2)}.`, "error");
-      return;
-    }
-    
-    const glosa = document.getElementById("v-glosa").value || "Voucher Contable";
-    postedVouchers.push({ glosa, entries: [...voucherRows] });
-    
-    voucherRows = [];
-    renderVoucherTable();
-    updateBalanceSheet();
-    
-    showToast("Asiento procesado con éxito.", "success");
-  });
-  
-  document.getElementById("btn-reset-balance").addEventListener("click", () => {
-    postedVouchers = [];
-    updateBalanceSheet();
-    showToast("El Balance de Comprobación ha sido reiniciado.", "info");
-  });
-  
-  renderVoucherTable();
-  updateBalanceSheet();
-}
-
-function renderVoucherTable() {
-  const container = document.getElementById("voucher-rows-container");
-  if (!container) return;
-  container.innerHTML = "";
-  
-  let totalDebe = 0;
-  let totalHaber = 0;
-  
-  voucherRows.forEach((row, index) => {
-    totalDebe += row.debe;
-    totalHaber += row.haber;
-    
-    const tr = document.createElement("tr");
-    tr.className = "voucher-row-el";
-    tr.innerHTML = `
-      <td style="padding:0.4rem 0.5rem; font-weight:700;">${row.code}</td>
-      <td style="padding:0.4rem 0.5rem; color:var(--text-muted); font-size:0.75rem;">${row.desc}</td>
-      <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--debe); font-weight:700;">${row.debe > 0 ? 'S/ ' + row.debe.toFixed(2) : '-'}</td>
-      <td style="padding:0.4rem 0.5rem; text-align:right; color:var(--haber); font-weight:700;">${row.haber > 0 ? 'S/ ' + row.haber.toFixed(2) : '-'}</td>
-      <td style="padding:0.4rem 0.5rem; text-align:center;">
-        <button class="btn-remove-row" onclick="removeVoucherRow(${index})">&times;</button>
-      </td>
-    `;
-    container.appendChild(tr);
-  });
-  
-  document.getElementById("v-total-debe").textContent = `S/ ${totalDebe.toFixed(2)}`;
-  document.getElementById("v-total-haber").textContent = `S/ ${totalHaber.toFixed(2)}`;
-}
-
-window.removeVoucherRow = function(idx) {
-  voucherRows.splice(idx, 1);
-  renderVoucherTable();
-};
-
-function updateBalanceSheet() {
-  const container = document.getElementById("balance-sheet-rows");
-  if (!container) return;
-  
-  container.innerHTML = "";
-  
-  const ledger = {};
-  postedVouchers.forEach(v => {
-    v.entries.forEach(ent => {
-      const code = ent.code;
-      if (!ledger[code]) {
-        ledger[code] = { desc: ent.desc, debe: 0, haber: 0 };
-      }
-      ledger[code].debe += ent.debe;
-      ledger[code].haber += ent.haber;
-    });
-  });
-  
-  const codes = Object.keys(ledger).sort();
-  
-  let totalDebeSum = 0;
-  let totalHaberSum = 0;
-  let totalDeudorSum = 0;
-  let totalAcreedorSum = 0;
-  
-  if (codes.length === 0) {
-    container.innerHTML = `<tr><td colspan="6" style="padding:1rem; text-align:center; color:var(--text-muted); font-style:italic;">No hay transacciones registradas.</td></tr>`;
-    document.getElementById("bal-sum-debe").textContent = "S/ 0.00";
-    document.getElementById("bal-sum-haber").textContent = "S/ 0.00";
-    document.getElementById("bal-sal-deudor").textContent = "S/ 0.00";
-    document.getElementById("bal-sal-acreedor").textContent = "S/ 0.00";
-    return;
-  }
-  
-  codes.forEach(code => {
-    const data = ledger[code];
-    const deb = data.debe;
-    const hab = data.haber;
-    
-    let deudor = 0;
-    let acreedor = 0;
-    
-    if (deb >= hab) {
-      deudor = deb - hab;
-    } else {
-      acreedor = hab - deb;
-    }
-    
-    totalDebeSum += deb;
-    totalHaberSum += hab;
-    totalDeudorSum += deudor;
-    totalAcreedorSum += acreedor;
-    
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); font-weight:700; text-align:center;">${code}</td>
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); font-size:0.7rem; color:var(--text-muted);">${data.desc}</td>
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">S/ ${deb.toFixed(2)}</td>
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right;">S/ ${hab.toFixed(2)}</td>
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; font-weight:700; color:var(--debe);">${deudor > 0 ? 'S/ ' + deudor.toFixed(2) : '-'}</td>
-      <td style="padding:0.35rem 0.4rem; border:1px solid var(--border); text-align:right; font-weight:700; color:var(--haber);">${acreedor > 0 ? 'S/ ' + acreedor.toFixed(2) : '-'}</td>
-    `;
-    container.appendChild(tr);
-  });
-  
-  document.getElementById("bal-sum-debe").textContent = `S/ ${totalDebeSum.toFixed(2)}`;
-  document.getElementById("bal-sum-haber").textContent = `S/ ${totalHaberSum.toFixed(2)}`;
-  document.getElementById("bal-sal-deudor").textContent = `S/ ${totalDeudorSum.toFixed(2)}`;
-  document.getElementById("bal-sal-acreedor").textContent = `S/ ${totalAcreedorSum.toFixed(2)}`;
-}
-
+// MODULO ELIMINADO: SISTEMAS CONTABLES
