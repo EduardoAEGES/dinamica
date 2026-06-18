@@ -1972,13 +1972,33 @@ function showBottomSheet(acc) {
   const bs = document.getElementById("pcge-bottom-sheet");
   const backdrop = document.getElementById("modal-backdrop");
   
+  if (!acc.nivel) {
+    acc.nivel = acc.codigo.length;
+  }
+  
   document.getElementById("pcge-detail-container").innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 0.85rem; padding-top: 0.25rem;">
       <div class="pcge-detail-badge">${acc.codigo}</div>
       
       <div class="pcge-detail-info">
-        <label>Nombre de la Cuenta / Descripción</label>
-        <span style="line-height: 1.3;">${acc.descripcion}</span>
+        <label>Nombre de la Cuenta</label>
+        <span style="line-height: 1.3; font-weight: 600;">${acc.descripcion || "—"}</span>
+      </div>
+      
+      <div class="pcge-detail-info">
+        <label>Descripción</label>
+        <div id="pcge-comentario-view" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
+          <span id="pcge-detail-comentario" style="line-height: 1.35; flex: 1; font-style: ${acc.comentario ? 'normal' : 'italic'}; color: ${acc.comentario ? 'var(--text-color)' : 'var(--text-muted)'};">${acc.comentario || "Sin descripción. Haz clic en el lápiz para agregar una."}</span>
+          <button id="btn-edit-comentario" style="background: none; border: none; cursor: pointer; color: var(--primary); padding: 0.25rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center;" title="Editar descripción">✏️</button>
+        </div>
+        <!-- Editor de Comentario -->
+        <div id="pcge-comentario-edit" style="display: none; flex-direction: column; gap: 0.5rem; width: 100%; margin-top: 0.25rem;">
+          <textarea id="input-edit-comentario" rows="3" style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-input); color: var(--text-color); font-family: inherit; resize: vertical;" placeholder="Escribe aquí la descripción o dinámica de la cuenta...">${acc.comentario || ''}</textarea>
+          <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+            <button id="btn-cancel-edit-comentario" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; font-weight: 500;">Cancelar</button>
+            <button id="btn-save-edit-comentario" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 4px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 500;">Guardar</button>
+          </div>
+        </div>
       </div>
       
       <div class="pcge-detail-info">
@@ -1999,6 +2019,86 @@ function showBottomSheet(acc) {
       </div>
     </div>
   `;
+  
+  // Vincular eventos de edición del comentario
+  const btnEdit = document.getElementById("btn-edit-comentario");
+  const btnCancel = document.getElementById("btn-cancel-edit-comentario");
+  const btnSave = document.getElementById("btn-save-edit-comentario");
+  const commentView = document.getElementById("pcge-comentario-view");
+  const commentEdit = document.getElementById("pcge-comentario-edit");
+  const inputEdit = document.getElementById("input-edit-comentario");
+  
+  if (btnEdit && btnCancel && btnSave && commentView && commentEdit && inputEdit) {
+    btnEdit.addEventListener("click", () => {
+      commentView.style.display = "none";
+      commentEdit.style.display = "flex";
+      inputEdit.focus();
+      inputEdit.select();
+    });
+    
+    btnCancel.addEventListener("click", () => {
+      commentEdit.style.display = "none";
+      commentView.style.display = "flex";
+      inputEdit.value = acc.comentario || "";
+    });
+    
+    btnSave.addEventListener("click", async () => {
+      const newComment = inputEdit.value.trim();
+      
+      if (newComment === (acc.comentario || "")) {
+        commentEdit.style.display = "none";
+        commentView.style.display = "flex";
+        return;
+      }
+      
+      try {
+        btnSave.disabled = true;
+        btnSave.textContent = "Guardando...";
+        
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=eq.${acc.codigo}`,
+          {
+            method: "PATCH",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ comentario: newComment || null })
+          }
+        );
+        
+        if (response.ok) {
+          acc.comentario = newComment;
+          
+          const labelEl = document.getElementById("pcge-detail-comentario");
+          if (newComment) {
+            labelEl.textContent = newComment;
+            labelEl.style.fontStyle = "normal";
+            labelEl.style.color = "var(--text-color)";
+          } else {
+            labelEl.textContent = "Sin descripción. Haz clic en el lápiz para agregar una.";
+            labelEl.style.fontStyle = "italic";
+            labelEl.style.color = "var(--text-muted)";
+          }
+          
+          showToast("Descripción guardada con éxito", "success");
+          
+          commentEdit.style.display = "none";
+          commentView.style.display = "flex";
+        } else {
+          showToast("Error al guardar en base de datos", "error");
+          btnSave.disabled = false;
+          btnSave.textContent = "Guardar";
+        }
+      } catch (err) {
+        console.error("Error al actualizar comentario:", err);
+        showToast("Error de conexión", "error");
+        btnSave.disabled = false;
+        btnSave.textContent = "Guardar";
+      }
+    });
+  }
   
   backdrop.style.display = "block";
   backdrop.offsetHeight; // Forzar reflujo
