@@ -99,7 +99,14 @@ const defaultDescriptions = {
   "251": "Materiales auxiliares",
   "261": "Envases",
   "61xx": "Variación de inventarios (Por definir)",
-  "79xx": "Cargas imputables a costos y gastos"
+  "79xx": "Cargas imputables a costos y gastos",
+  "43": "CUENTAS POR PAGAR COMERCIALES – RELACIONADAS",
+  "431": "Facturas, boletas y otros comprobantes por pagar",
+  "4312": "Emitidas",
+  "60xx": "Compras (Por definir)",
+  "42xx": "Cuentas por pagar comerciales - Terceros (Por definir)",
+  "43xx": "Cuentas por pagar comerciales - Relacionadas (Por definir)",
+  "2xxx": "Activo realizable (Por definir)"
 };
 
 // Función para obtener descripciones dinámicas desde Supabase
@@ -291,6 +298,91 @@ const operations = [
             entries: [
               { code: "9xxx", type: "debe", value: valor, helper: "Cuentas de enlace/costos (Por definir)" },
               { code: "79xx", type: "haber", value: valor, helper: "Cargas imputables a costos y gastos" }
+            ]
+          }
+        ]
+      };
+    }
+  },
+  {
+    id: 5,
+    name: "Compra de activos realizables (almacenados)",
+    description: "Compra de mercaderías, materias primas o suministros que ingresan al almacén. Permite elegir la condición del IGV (con o sin crédito fiscal, o no gravada) y el tipo de cuenta por pagar.",
+    inputTemplate: "compra_almacenada",
+    defaultValues: {
+      valor: 4000,
+      tipo: "materia_prima",
+      igvCond: "gravada_credito",
+      porPagar: "terceros"
+    },
+    calculate: (vals) => {
+      const valor = vals.valor;
+      
+      // Determinar IGV según condición
+      let igv = 0;
+      let tieneIGV = false;
+      let cuentaIGV = "";
+      let helperIGV = "";
+      
+      if (vals.igvCond === "gravada_credito") {
+        igv = valor * 0.18;
+        tieneIGV = true;
+        cuentaIGV = "40111";
+        helperIGV = "IGV - Cuenta propia (Crédito Fiscal)";
+      } else if (vals.igvCond === "gravada_sin_credito") {
+        igv = valor * 0.18;
+        tieneIGV = true;
+        cuentaIGV = "1673";
+        helperIGV = "IGV por acreditar en compras";
+      }
+      
+      const precio = valor + igv;
+      
+      // Determinar cuentas por pagar
+      const cuentaPagar = vals.porPagar === "relacionadas" ? "43xx" : "42xx";
+      const helperPagar = vals.porPagar === "relacionadas" 
+        ? "Cuentas por pagar comerciales - Relacionadas" 
+        : "Cuentas por pagar comerciales - Terceros";
+        
+      // Determinar cuentas del bien (con marcadores de posición 60xx, 2xxx, 61xx)
+      const cuentaCompra = "60xx";
+      const cuentaAlmacen = "2xxx";
+      const cuentaVariacion = "61xx";
+      
+      let descCompra = "Compra de mercadería";
+      let descAlmacen = "Mercaderías manufacturadas - Costo";
+      let descVariacion = "Variación de mercaderías";
+      
+      if (vals.tipo === "materia_prima") {
+        descCompra = "Compra de materia prima";
+        descAlmacen = "Materias primas para prod. manufacturados";
+        descVariacion = "Variación de materias primas";
+      } else if (vals.tipo === "suministros") {
+        descCompra = "Compra de repuestos/suministros";
+        descAlmacen = "Otros suministros - Almacén";
+        descVariacion = "Variación de materiales aux, suministros y repuestos";
+      }
+
+      // Estructurar asientos
+      const entriesNaturaleza = [
+        { code: cuentaCompra, type: "debe", value: valor, helper: descCompra }
+      ];
+      if (tieneIGV) {
+        entriesNaturaleza.push({ code: cuentaIGV, type: "debe", value: igv, helper: helperIGV });
+      }
+      entriesNaturaleza.push({ code: cuentaPagar, type: "haber", value: precio, helper: helperPagar });
+
+      return {
+        blocks: [
+          {
+            title: "Asiento de Naturaleza (Compra de activos realizables)",
+            entries: entriesNaturaleza
+          },
+          {
+            title: "Asiento de Destino (Ingreso al almacén)",
+            entries: [
+              { code: cuentaAlmacen, type: "debe", value: valor, helper: descAlmacen },
+              { code: cuentaVariacion, type: "haber", value: valor, helper: descVariacion }
             ]
           }
         ]
@@ -792,6 +884,21 @@ function renderInputs(op) {
           <option value="suministros" ${op.defaultValues.tipo === 'suministros' ? 'selected' : ''}>Repuestos/Suministros (C-6033/A-25)</option>
         </select>
       </div>
+      <div class="input-group">
+        <label for="input-igv-cond">Condición de IGV</label>
+        <select id="input-igv-cond" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="gravada_credito" ${op.defaultValues.igvCond === 'gravada_credito' ? 'selected' : ''}>Gravada con IGV (Con Crédito Fiscal - C-40111)</option>
+          <option value="gravada_sin_credito" ${op.defaultValues.igvCond === 'gravada_sin_credito' ? 'selected' : ''}>Gravada con IGV (Sin Crédito Fiscal / C-1673)</option>
+          <option value="no_gravada" ${op.defaultValues.igvCond === 'no_gravada' ? 'selected' : ''}>No Gravada con IGV</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="input-por-pagar">Cuenta por Pagar</label>
+        <select id="input-por-pagar" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="terceros" ${op.defaultValues.porPagar === 'terceros' ? 'selected' : ''}>Comerciales Terceros (C-4212)</option>
+          <option value="relacionadas" ${op.defaultValues.porPagar === 'relacionadas' ? 'selected' : ''}>Comerciales Relacionadas (C-4312)</option>
+        </select>
+      </div>
     `;
     inputsContainer.querySelectorAll("input, select").forEach(el => {
       el.addEventListener("input", () => updateLedger(op));
@@ -1000,7 +1107,9 @@ function getValuesFromInputs(op) {
   } else if (op.inputTemplate === "compra_almacenada") {
     return {
       valor: Number(document.getElementById("input-valor").value) || 0,
-      tipo: document.getElementById("input-tipo").value
+      tipo: document.getElementById("input-tipo").value,
+      igvCond: document.getElementById("input-igv-cond").value,
+      porPagar: document.getElementById("input-por-pagar").value
     };
   } else if (op.inputTemplate === "consumo_realizables") {
     return {
@@ -1181,18 +1290,23 @@ function renderSummary(op, inputs) {
     sumVal3.textContent = formatter.format(calcVal);
     sumVal3.style.color = "var(--primary)";
 
-  } else if (op.inputTemplate === "compra_almacenada" || op.inputTemplate === "compra_inmediata" || op.inputTemplate === "gastos_servicios" || op.inputTemplate === "compra_ppe") {
+  } else if (op.inputTemplate === "compra_almacenada") {
     const valor = inputs.valor || 0;
-    const igv = valor * 0.18;
+    let igv = 0;
+    if (inputs.igvCond === "gravada_credito" || inputs.igvCond === "gravada_sin_credito") {
+      igv = valor * 0.18;
+    }
     const total = valor + igv;
     
     label1.textContent = "Neto";
     sumVal1.textContent = formatter.format(valor);
-    label2.textContent = "IGV (18%)";
+    label2.textContent = inputs.igvCond === "no_gravada" ? "IGV (0%)" : "IGV (18%)";
     sumVal2.textContent = formatter.format(igv);
     label3.textContent = "Total";
     sumVal3.textContent = formatter.format(total);
     sumVal3.style.color = "var(--primary)";
+    
+  } else if (op.inputTemplate === "compra_inmediata" || op.inputTemplate === "gastos_servicios" || op.inputTemplate === "compra_ppe") {
     
   } else if (op.inputTemplate === "venta") {
     const valor = inputs.valor || 0;
@@ -1317,31 +1431,33 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
   
   blockDiv.innerHTML = `
     <h4 class="ledger-block-title">${block.title}</h4>
-    <table class="ledger-table">
-      <thead>
-        <tr>
-          <th style="width: 20%;">CODIGO</th>
-          <th style="width: 45%;">DENOMINACION</th>
-          <th style="width: 15%;">DEBE</th>
-          <th style="width: 15%;">HABER</th>
-          <th style="width: 5%;"></th>
-        </tr>
-      </thead>
-      <tbody class="ledger-rows-container"></tbody>
-      <tfoot>
-        <tr style="border-top: 2px solid var(--border); font-weight: 700;">
-          <td colspan="2" style="text-align: right; padding: 0.5rem 0.75rem;">Total:</td>
-          <td class="ledger-total-debe center" style="color: var(--debe); padding: 0.5rem 0.75rem;">S/ 0.00</td>
-          <td class="ledger-total-haber center" style="color: var(--haber); padding: 0.5rem 0.75rem;">S/ 0.00</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colspan="5" class="ledger-balance-status center" style="padding: 0.5rem; font-size: 0.85rem; font-weight: bold; border-radius: 8px; text-align: center; line-height: 1.5;">
-            <!-- Estado de balance -->
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+    <div class="ledger-table-wrapper">
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th style="width: 20%;">CODIGO</th>
+            <th style="width: 45%;">DENOMINACION</th>
+            <th style="width: 15%;">DEBE</th>
+            <th style="width: 15%;">HABER</th>
+            <th style="width: 5%;"></th>
+          </tr>
+        </thead>
+        <tbody class="ledger-rows-container"></tbody>
+        <tfoot>
+          <tr style="border-top: 2px solid var(--border); font-weight: 700;">
+            <td colspan="2" style="text-align: right; padding: 0.5rem 0.75rem;">Total:</td>
+            <td class="ledger-total-debe center" style="color: var(--debe); padding: 0.5rem 0.75rem;">S/ 0.00</td>
+            <td class="ledger-total-haber center" style="color: var(--haber); padding: 0.5rem 0.75rem;">S/ 0.00</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="5" class="ledger-balance-status center" style="padding: 0.5rem; font-size: 0.85rem; font-weight: bold; border-radius: 8px; text-align: center; line-height: 1.5;">
+              <!-- Estado de balance -->
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   `;
   
   const rowsContainer = blockDiv.querySelector(".ledger-rows-container");

@@ -490,12 +490,20 @@ header {
   flex-direction: column;
   gap: 1.5rem;
   padding-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0 !important;
+  box-sizing: border-box;
 }
 
 .ledger-block {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0 !important;
+  box-sizing: border-box;
 }
 
 .ledger-block-title {
@@ -509,12 +517,41 @@ header {
 }
 
 /* Asiento Tipo Tabla (Classical Grid) al estilo de la segunda imagen */
+.ledger-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0 !important;
+  box-sizing: border-box;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--bg-input);
+}
+
+.ledger-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ledger-table-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ledger-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.ledger-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
 .ledger-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0.5rem;
   background-color: var(--bg-input);
-  box-shadow: var(--shadow-sm);
 }
 
 .ledger-table th, .ledger-table td {
@@ -548,6 +585,25 @@ header {
   width: 100%;
 }
 
+.ledger-table .ledger-code-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.35rem;
+  text-align: center;
+  outline: none;
+}
+
+.ledger-table .ledger-code-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
 .ledger-table .ledger-amount-input {
   width: 100%;
   border: none;
@@ -570,6 +626,68 @@ header {
   background: var(--bg-input);
   border-bottom: 2px solid var(--primary);
   border-radius: 4px;
+}
+
+@media (max-width: 767px) {
+  /* Ancho y scroll de la tabla */
+  .ledger-table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  /* Ajuste de anchos proporcionales de columnas para móviles */
+  .ledger-table th:nth-child(1),
+  .ledger-table td:nth-child(1) {
+    width: 18% !important; /* CODIGO */
+  }
+  .ledger-table th:nth-child(2),
+  .ledger-table td:nth-child(2) {
+    width: 32% !important; /* DENOMINACION */
+  }
+  .ledger-table th:nth-child(3),
+  .ledger-table td:nth-child(3) {
+    width: 22% !important; /* DEBE */
+  }
+  .ledger-table th:nth-child(4),
+  .ledger-table td:nth-child(4) {
+    width: 22% !important; /* HABER */
+  }
+  .ledger-table th:nth-child(5),
+  .ledger-table td:nth-child(5) {
+    width: 6% !important; /* ELIMINAR */
+  }
+
+  /* Reducir padding de celdas */
+  .ledger-table th, 
+  .ledger-table td {
+    padding: 0.35rem 0.2rem !important;
+    font-size: 0.72rem !important;
+  }
+  
+  .ledger-table th {
+    font-size: 0.7rem !important;
+  }
+
+  /* Hacer el input de código más compacto */
+  .ledger-table .ledger-code-input {
+    font-size: 0.78rem !important;
+    padding: 0.15rem 0.1rem !important;
+    border-radius: 3px !important;
+  }
+
+  /* Hacer los inputs de montos más compactos */
+  .ledger-table .ledger-amount-input {
+    font-size: 0.78rem !important;
+    padding: 0.15rem 0.05rem !important;
+  }
+  
+  /* Reducir la descripción oficial */
+  .ledger-table .desc-official {
+    font-size: 0.65rem !important;
+    line-height: 1.15 !important;
+    display: block;
+    word-break: break-word;
+  }
 }
 
 .ledger-table .btn-delete-row:hover {
@@ -1248,6 +1366,8 @@ body.is-mobile-device .bottom-nav {
   #screen-op-detail > .ledger-view {
     flex: 1.2 1 400px !important;
     margin-top: 0 !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
   /* === PANEL PRINCIPAL DE DINÁMICA DE ELEMENTOS CONTABLES === */
