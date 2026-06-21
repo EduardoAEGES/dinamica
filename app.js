@@ -496,6 +496,9 @@ function navigateTo(screenId) {
   if (screenId === "dinamica") {
     showDinamicaPanel("panel-dinamica-hub");
   }
+  if (screenId === "logica") {
+    showLogicaPanel("panel-logica-hub");
+  }
 }
 
 // Cambiar de panel interno dentro de la pantalla de Dinámica
@@ -510,6 +513,25 @@ function showDinamicaPanel(panelId) {
   const target = document.getElementById(panelId);
   if (target) {
     target.classList.add("active");
+  }
+}
+
+// Cambiar de panel interno dentro de la pantalla de Lógica
+function showLogicaPanel(panelId) {
+  const container = document.getElementById("screen-logica");
+  if (!container) return;
+  
+  container.querySelectorAll(".sub-panel").forEach(panel => {
+    panel.classList.remove("active");
+  });
+  
+  const target = document.getElementById(panelId);
+  if (target) {
+    target.classList.add("active");
+  }
+  
+  if (typeof resetQuizzes === "function") {
+    resetQuizzes();
   }
 }
 
@@ -575,6 +597,16 @@ function setupNavigation() {
       const hubPanel = document.getElementById("panel-dinamica-hub");
       if (hubPanel && !hubPanel.classList.contains("active")) {
         showDinamicaPanel("panel-dinamica-hub");
+        return;
+      }
+    }
+
+    // Si estamos en la pantalla de lógica y no estamos en el hub de lógica, volver al hub de lógica
+    const screenLogica = document.getElementById("screen-logica");
+    if (screenLogica && screenLogica.classList.contains("active")) {
+      const hubPanelLogica = document.getElementById("panel-logica-hub");
+      if (hubPanelLogica && !hubPanelLogica.classList.contains("active")) {
+        showLogicaPanel("panel-logica-hub");
         return;
       }
     }
@@ -2457,6 +2489,21 @@ const challenges = [
 let currentChallengeIdx = 0;
 
 function setupLogicaModule() {
+  // 1. Navegación interna del Hub de Lógica
+  document.querySelectorAll(".logica-hub-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panelId = btn.dataset.logicaPanel;
+      showLogicaPanel(panelId);
+    });
+  });
+
+  document.querySelectorAll(".btn-back-to-logica-hub").forEach(btn => {
+    btn.addEventListener("click", () => {
+      showLogicaPanel("panel-logica-hub");
+    });
+  });
+
+  // 2. Operaciones del Generador de Tablas de Verdad (Semana 3)
   const logicOps = document.querySelectorAll(".btn-op-logic");
   const exprInput = document.getElementById("logic-expr");
   
@@ -2481,9 +2528,305 @@ function setupLogicaModule() {
       generateTruthTable(exprInput.value);
     });
   }
-  
+
+  // 3. Inicializar Quizzes de las Semanas
+  initWeekQuizzes();
+
+  // 4. Inicializar Consulta de Calificaciones
+  initGradeLookupModule();
+
+  // 5. Desafíos Lógicos (Semana 8)
   setupChallenges();
 }
+
+// Resetea los quizzes a su estado inicial
+function resetQuizzes() {
+  document.querySelectorAll(".quiz-card").forEach(quiz => {
+    const feedback = quiz.querySelector(".quiz-feedback");
+    if (feedback) {
+      feedback.style.display = "none";
+      feedback.textContent = "";
+      feedback.className = "quiz-feedback";
+    }
+    quiz.querySelectorAll(".quiz-option-btn").forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove("correct", "incorrect");
+    });
+  });
+}
+
+// Inicializa la interactividad de los quizzes semanales
+function initWeekQuizzes() {
+  document.querySelectorAll(".quiz-card").forEach(quiz => {
+    const feedback = quiz.querySelector(".quiz-feedback");
+    if (!feedback) return;
+    
+    quiz.querySelectorAll(".quiz-option-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Deshabilitar todas las opciones de este quiz
+        quiz.querySelectorAll(".quiz-option-btn").forEach(b => b.disabled = true);
+        
+        const isCorrect = btn.dataset.correct === "true";
+        if (isCorrect) {
+          btn.classList.add("correct");
+          feedback.textContent = "¡Excelente! Respuesta correcta. 🎯";
+          feedback.className = "quiz-feedback correct";
+          feedback.style.background = "var(--primary-light)";
+          feedback.style.color = "var(--primary-hover)";
+        } else {
+          btn.classList.add("incorrect");
+          feedback.textContent = "Respuesta incorrecta. ¡Sigue repasando la teoría!";
+          feedback.className = "quiz-feedback incorrect";
+          feedback.style.background = "var(--haber-light)";
+          feedback.style.color = "var(--haber)";
+          
+          // Resaltar la respuesta correcta
+          quiz.querySelectorAll(".quiz-option-btn").forEach(b => {
+            if (b.dataset.correct === "true") {
+              b.classList.add("correct");
+            }
+          });
+        }
+        feedback.style.display = "block";
+      });
+    });
+  });
+}
+
+// Base de datos de calificaciones de Pensamiento Lógico (transcrita de los registros de Excel)
+const studentGradesData = [
+  { dni: "71336870", name: "POLLETHE LUCIA", lastname: "ARENAS KALINOWSKI", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
+  { dni: "79543944", name: "ESTEBAN JOSUE", lastname: "COPAJA AQUINO", team: "2", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 } },
+  { dni: "75971521", name: "GIAN FRANCO", lastname: "GOMEZ MAYTA", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "60967749", name: "NOEMI IDALIA", lastname: "GOMEZ PUMA", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 } },
+  { dni: "72613030", name: "MARIA JULIA", lastname: "HUISACAYNA COLQUE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 } },
+  { dni: "61598208", name: "JIMMY NANDOR", lastname: "JUSTO QUISPE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
+  { dni: "76075806", name: "ELY ROCÍO", lastname: "MARTINEZ CCORPUNA", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
+  { dni: "72086042", name: "KATTY DAYANA", lastname: "MIRANDA SUAQUITA", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
+  { dni: "60732185", name: "JORGE DAVID", lastname: "MOLINA ALVARADO", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:10 } },
+  { dni: "62351533", name: "SEBASTIAN ERNESTO", lastname: "ORCONI GUTIERREZ", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "60058856", name: "FRANCO LARRY", lastname: "QUISPE LINARES", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "61366491", name: "NAHOMI SELENE", lastname: "ROMAN QUISPE", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
+  { dni: "61236333", name: "ROCIO XIMENA", lastname: "SALDIVAR TORRES", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
+  { dni: "61324266", name: "FABRICIO ANDERSON", lastname: "SALLUCA SUERO", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "61413843", name: "MIJAHIL FRANCESCO", lastname: "VEGA HUAMAN", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 } },
+  { dni: "60044657", name: "CINTYA MEILY", lastname: "YRUPAYLLA QUISPE", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } }
+];
+
+// Inicializa el Módulo de Consulta de Calificaciones por DNI
+function initGradeLookupModule() {
+  const btnSearch = document.getElementById("btn-search-dni");
+  const dniInput = document.getElementById("dni-lookup");
+  const resultsCard = document.getElementById("grade-results-card");
+  const singleView = document.getElementById("single-student-view");
+  const masterView = document.getElementById("master-students-view");
+  const btnBackToMaster = document.getElementById("btn-back-to-master-list");
+  const masterSearchInput = document.getElementById("master-search-input");
+  
+  if (btnSearch && dniInput && resultsCard) {
+    btnSearch.addEventListener("click", () => {
+      performLookup();
+    });
+    
+    dniInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        performLookup();
+      }
+    });
+
+    btnBackToMaster.addEventListener("click", () => {
+      singleView.style.display = "none";
+      masterView.style.display = "flex";
+      btnBackToMaster.style.display = "none";
+    });
+
+    masterSearchInput.addEventListener("input", () => {
+      filterMasterList(masterSearchInput.value.trim());
+    });
+  }
+
+  function performLookup() {
+    const dni = dniInput.value.trim();
+    if (!dni) {
+      showToast("Por favor, ingresa un DNI.", "error");
+      return;
+    }
+
+    if (dni === "46069339") {
+      // MODO MÁSTER: Mostrar lista de todos los estudiantes
+      showToast("Acceso de Administrador Máster concedido.");
+      resultsCard.style.display = "flex";
+      singleView.style.display = "none";
+      masterView.style.display = "flex";
+      btnBackToMaster.style.display = "none";
+      
+      renderMasterList();
+    } else {
+      // MODO ESTUDIANTE INDIVIDUAL
+      const student = studentGradesData.find(s => s.dni === dni);
+      if (!student) {
+        showToast("DNI no registrado. Intenta nuevamente.", "error");
+        resultsCard.style.display = "none";
+        return;
+      }
+      
+      resultsCard.style.display = "flex";
+      masterView.style.display = "none";
+      singleView.style.display = "flex";
+      btnBackToMaster.style.display = "none"; // Ocultar porque no viene del máster
+      
+      populateStudentDetails(student);
+      showToast("Calificaciones cargadas correctamente.");
+    }
+  }
+
+  function populateStudentDetails(student) {
+    document.getElementById("student-fullname").textContent = `${student.name} ${student.lastname}`;
+    document.getElementById("student-dni").textContent = student.dni;
+    document.getElementById("student-team").textContent = student.team;
+    
+    const promAA1 = student.aa1.promedio;
+    const promAA2 = student.aa2.promedio;
+    
+    // CF es "Por calificar"
+    const finalEl = document.getElementById("final-course-average");
+    finalEl.textContent = "Por calificar";
+    finalEl.style.color = "var(--text-muted)";
+    finalEl.style.fontSize = "0.95rem";
+    finalEl.style.fontWeight = "700";
+    
+    // AA1
+    const aa1Badge = document.getElementById("promedio-aa1-badge");
+    aa1Badge.textContent = `Prm: ${promAA1}`;
+    if (promAA1 >= 13) {
+      aa1Badge.style.background = "var(--debe-light)";
+      aa1Badge.style.color = "var(--debe)";
+    } else {
+      aa1Badge.style.background = "var(--haber-light)";
+      aa1Badge.style.color = "var(--haber)";
+    }
+    
+    document.getElementById("informe-aa1-val").textContent = student.aa1.informe;
+    document.getElementById("r11-val").textContent = student.aa1.r1_1 || "0";
+    document.getElementById("r21-val").textContent = student.aa1.r2_1 || "0";
+    document.getElementById("r31-val").textContent = student.aa1.r3_1 || "0";
+    document.getElementById("r41-val").textContent = student.aa1.r4_1 || "0";
+    document.getElementById("r51-val").textContent = student.aa1.r5_1 || "0";
+    document.getElementById("exposicion-aa1-val").textContent = student.aa1.exposicion;
+    document.getElementById("r12_1-val").textContent = student.aa1.r1_2 || "0";
+    document.getElementById("r22_1-val").textContent = student.aa1.r2_2 || "0";
+    document.getElementById("r32_1-val").textContent = student.aa1.r3_2 || "0";
+    document.getElementById("r42_1-val").textContent = student.aa1.r4_2 || "0";
+    
+    // AA2
+    const aa2Badge = document.getElementById("promedio-aa2-badge");
+    aa2Badge.textContent = `Prm: ${promAA2}`;
+    if (promAA2 >= 13) {
+      aa2Badge.style.background = "var(--debe-light)";
+      aa2Badge.style.color = "var(--debe)";
+    } else {
+      aa2Badge.style.background = "var(--haber-light)";
+      aa2Badge.style.color = "var(--haber)";
+    }
+    
+    document.getElementById("informe-aa2-val").textContent = student.aa2.informe;
+    document.getElementById("r11_2-val").textContent = student.aa2.r1_1 || "0";
+    document.getElementById("r21_2-val").textContent = student.aa2.r2_1 || "0";
+    document.getElementById("r31_2-val").textContent = student.aa2.r3_1 || "0";
+    document.getElementById("r41_2-val").textContent = student.aa2.r4_1 || "0";
+    document.getElementById("r52_2-val").textContent = student.aa2.r5_1 || "0";
+    
+    document.getElementById("exposicion-aa2-val").textContent = student.aa2.exposicion;
+    document.getElementById("r12_2-val").textContent = student.aa2.r1_2 || "0";
+    document.getElementById("r22_2-val").textContent = student.aa2.r2_2 || "0";
+    document.getElementById("r32_2-val").textContent = student.aa2.r3_2 || "0";
+    document.getElementById("r42_2-val").textContent = student.aa2.r4_2 || "0";
+    
+    // AA3 (Por calificar)
+    const aa3Badge = document.getElementById("promedio-aa3-badge");
+    aa3Badge.textContent = "Pnd.";
+    aa3Badge.style.background = "var(--border)";
+    aa3Badge.style.color = "var(--text-muted)";
+    document.getElementById("promedio-aa3-val").textContent = "Por calificar";
+    document.getElementById("promedio-aa3-val").style.color = "var(--text-muted)";
+    
+    // E4 (Por calificar)
+    const e4Badge = document.getElementById("promedio-e4-badge");
+    e4Badge.textContent = "Pnd.";
+    e4Badge.style.background = "var(--border)";
+    e4Badge.style.color = "var(--text-muted)";
+    
+    document.getElementById("promedio-e4-val").textContent = "Por calificar";
+    document.getElementById("promedio-e4-val").style.color = "var(--text-muted)";
+    document.getElementById("aa4-val").textContent = "Por calificar";
+    document.getElementById("pa-val").textContent = "Por calificar";
+  }
+
+  function renderMasterList() {
+    const listBody = document.getElementById("master-students-list-body");
+    if (!listBody) return;
+    
+    listBody.innerHTML = "";
+    
+    studentGradesData.forEach(student => {
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid var(--border)";
+      tr.dataset.studentName = `${student.name} ${student.lastname}`.toLowerCase();
+      tr.dataset.studentDni = student.dni;
+      
+      tr.innerHTML = `
+        <td style="padding: 0.5rem 0.4rem; font-weight: 700; color: var(--text-main);">${student.name} ${student.lastname}</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted);">${student.dni}</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 700;">${student.aa1.promedio}</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 700;">${student.aa2.promedio}</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.65rem;">Por calificar</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center;">
+          <button class="btn-primary btn-inspect-student" data-dni="${student.dni}" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">Ver</button>
+        </td>
+      `;
+      
+      tr.querySelector(".btn-inspect-student").addEventListener("click", () => {
+        const targetStudent = studentGradesData.find(s => s.dni === student.dni);
+        if (targetStudent) {
+          masterView.style.display = "none";
+          singleView.style.display = "flex";
+          btnBackToMaster.style.display = "block";
+          populateStudentDetails(targetStudent);
+        }
+      });
+      
+      listBody.appendChild(tr);
+    });
+  }
+
+  function filterMasterList(query) {
+    const listBody = document.getElementById("master-students-list-body");
+    if (!listBody) return;
+    
+    const rows = listBody.querySelectorAll("tr");
+    const q = query.toLowerCase();
+    
+    rows.forEach(row => {
+      const name = row.dataset.studentName;
+      const dni = row.dataset.studentDni;
+      if (name.includes(q) || dni.includes(q)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 
 function evaluateLogic(expr, p, q) {
   let clean = expr.replace(/\s+/g, "");
