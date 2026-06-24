@@ -149,270 +149,484 @@ const operations = [
     id: 1,
     name: "Asiento de Apertura",
     description: "Registro inicial de los activos, pasivos y patrimonio con los que la empresa inicia sus operaciones.",
-    inputTemplate: "apertura",
-    defaultValues: {
-      caja: 6800,
-      mercaderias: 1800,
-      suministros: 150,
-      ctasPagar: 2200,
-      capital: 6150,
-      resultados: 400
-    },
-    calculate: (vals) => {
-      const debeTotal = vals.caja + vals.mercaderias + vals.suministros;
-      const haberTotal = vals.ctasPagar + vals.capital + vals.resultados;
-      return {
-        debeTotal,
-        haberTotal,
-        balanced: debeTotal === haberTotal,
+    blocks: [
+      {
+        title: "1. Asiento de Apertura",
         entries: [
-          { code: "1xxx", type: "debe", value: vals.caja, helper: "Activo disponible y exigible" },
-          { code: "2xxx", type: "debe", value: vals.mercaderias + vals.suministros, helper: "Activo realizable" },
-          { code: "3xxx", type: "debe", value: "", helper: "Activo inmovilizado" },
-          { code: "4xxx", type: "haber", value: vals.ctasPagar, helper: "Pasivo (Obligaciones)" },
-          { code: "5xxx", type: "haber", value: vals.capital + vals.resultados, helper: "Patrimonio (Capital/Resultados)" }
+          { code: "1XXX", type: "debe", value: "XXXX" },
+          { code: "2XXX", type: "debe", value: "XXXX" },
+          { code: "3XXX", type: "debe", value: "XXXX" },
+          { code: "4XXX", type: "haber", value: "XXXX" },
+          { code: "5XXX", type: "haber", value: "XXXX" }
         ]
-      };
-    }
+      }
+    ]
   },
   {
     id: 2,
-    name: "Aumento de Capital",
-    description: "Registro contable del aumento de capital social de la empresa, cubriendo el acuerdo (suscripción), la entrega de aportes (integración) y la formalización en registros públicos (capitalización).",
-    inputTemplate: "aumento_capital",
-    defaultValues: {
-      total: 200000,
-      efectivo: 80000,
-      bienes: 90000
-    },
-    calculate: (vals) => {
-      const total = vals.total;
-      const efectivo = vals.efectivo;
-      const bienes = vals.bienes;
-      const integrado = efectivo + bienes;
-      
-      const blocks = [
-        {
-          title: "A1. Por el acta de aumento de capital",
-          entries: [
-            { code: "1421", type: "debe", value: total, helper: "Suscripciones por cobrar a socios" },
-            { code: "5221", type: "haber", value: total, helper: "Capital adicional - Aportes" }
-          ]
-        },
-        {
-          title: "A2. Por cobro de aportes por aumento de capital",
-          entries: []
-        },
-        {
-          title: "A3. Por la formalización del aumento de capital mediante Escritura Pública",
-          entries: [
-            { code: "5221", type: "debe", value: integrado, helper: "Capital adicional - Aportes" },
-            { code: "5012", type: "haber", value: integrado, helper: "Capital - Participaciones / Acciones" }
-          ]
-        }
-      ];
-      
-      // Integración: Efectivo
-      if (efectivo > 0) {
-        blocks[1].entries.push({ code: "1xxx", type: "debe", value: efectivo, helper: "Cuentas corrientes operativas" });
+    name: "Compra de Activo Realizable (almacenable)",
+    description: "Adquisición de mercaderías, materias primas o suministros que ingresan al almacén.",
+    blocks: [
+      {
+        title: "2.1. Asiento de Naturaleza",
+        entries: [
+          { code: "60XX", type: "debe", value: "Valor venta" },
+          { code: "40111", type: "debe", value: "IGV" },
+          { code: "4212/4312", type: "haber", value: "Importe Total" }
+        ]
+      },
+      {
+        title: "2.2. Asiento de Destino",
+        entries: [
+          { code: "2XXX", type: "debe", value: "Valor venta" },
+          { code: "61XX", type: "haber", value: "Valor venta" }
+        ]
       }
-      // Integración: Bienes/Mercaderías
-      if (bienes > 0) {
-        blocks[1].entries.push({ code: "2xxx", type: "debe", value: bienes, helper: "Mercaderías manufacturadas" });
-      }
-      // Integración: Cuentas por cobrar
-      if (integrado > 0) {
-        blocks[1].entries.push({ code: "1421", type: "haber", value: integrado, helper: "Suscripciones por cobrar a socios" });
-      }
-      
-      return { blocks };
-    }
+    ]
   },
   {
     id: 3,
-    name: "Constitución de Reservas",
-    description: "Registro de la detracción de utilidades acumuladas para constituir reservas de la empresa (reserva legal, facultativa o estatutaria) conforme a ley o estatutos.",
-    inputTemplate: "reserva",
-    defaultValues: {
-      tipo: "legal",
-      utilidad: 240000,
-      porcentaje: 10,
-      montoFijo: 80000
-    },
-    calculate: (vals) => {
-      const tipo = vals.tipo;
-      const utilidad = vals.utilidad;
-      const porcentaje = vals.porcentaje;
-      const montoFijo = vals.montoFijo;
-      
-      let valor = 0;
-      let haberCode = "58x";
-      let haberHelper = "Reserva por definir";
-      
-      if (tipo === "legal") {
-        valor = utilidad * 0.10;
-        haberHelper = "Reserva Legal";
-      } else if (tipo === "estatutaria") {
-        valor = utilidad * (porcentaje / 100);
-        haberHelper = "Reserva Estatutaria";
-      } else if (tipo === "facultativa") {
-        valor = montoFijo;
-        haberHelper = "Reserva Facultativa";
-      }
-      
-      return {
-        blocks: [
-          {
-            title: "Por la constitución de la reserva",
-            entries: [
-              { code: "5911", type: "debe", value: valor, helper: "Utilidades acumuladas" },
-              { code: haberCode, type: "haber", value: valor, helper: haberHelper }
-            ]
-          }
+    name: "Venta del giro del negocio",
+    description: "Registro de la venta de bienes o mercaderías propias de la actividad comercial de la empresa.",
+    blocks: [
+      {
+        title: "3. Venta del giro del negocio",
+        entries: [
+          { code: "1212/1312", type: "debe", value: "Importe Total" },
+          { code: "40111", type: "haber", value: "IGV" },
+          { code: "70XX", type: "haber", value: "Valor venta" }
         ]
-      };
-    }
+      }
+    ]
   },
   {
     id: 4,
-    name: "Consumo / Envío a producción de activos realizables",
-    description: "Registro del consumo o envío a producción de materias primas, materiales auxiliares, envases y embalajes.",
-    inputTemplate: "consumo_realizables",
-    defaultValues: {
-      tipo: "materias_primas",
-      valor: 15000
-    },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      return {
-        blocks: [
-          {
-            title: "Por el envío a producción / consumo (Naturaleza)",
-            entries: [
-              { code: "61xx", type: "debe", value: valor, helper: "Variación de inventarios" },
-              { code: "2xxx", type: "haber", value: valor, helper: "Activo realizable (Por definir)" }
-            ]
-          },
-          {
-            title: "Por la aplicación al costo (Destino)",
-            entries: [
-              { code: "9xxx", type: "debe", value: valor, helper: "Cuentas de enlace/costos (Por definir)" },
-              { code: "79xx", type: "haber", value: valor, helper: "Cargas imputables a costos y gastos" }
-            ]
-          }
+    name: "Pago / Cobro",
+    description: "Registro de los pagos realizados a proveedores o cobros recibidos de clientes.",
+    blocks: [
+      {
+        title: "4.1. Pago",
+        entries: [
+          { code: "4XXX", type: "debe", value: "Importe Total" },
+          { code: "10XX", type: "haber", value: "Importe Total" }
         ]
-      };
-    }
+      },
+      {
+        title: "4.2. Cobro",
+        entries: [
+          { code: "10XX", type: "debe", value: "Importe Total" },
+          { code: "1XXX", type: "haber", value: "Importe Total" }
+        ]
+      }
+    ]
   },
   {
     id: 5,
-    name: "Compra de activos realizables (almacenados)",
-    description: "Compra de mercaderías, materias primas o suministros que ingresan al almacén. Permite elegir la condición del IGV (con o sin crédito fiscal, o no gravada) y el tipo de cuenta por pagar.",
-    inputTemplate: "compra_almacenada",
-    defaultValues: {
-      valor: 4000,
-      tipo: "materia_prima",
-      igvCond: "gravada_credito",
-      porPagar: "terceros"
-    },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      
-      // Determinar IGV según condición
-      let igv = 0;
-      let tieneIGV = false;
-      let cuentaIGV = "";
-      let helperIGV = "";
-      
-      if (vals.igvCond === "gravada_credito") {
-        igv = valor * 0.18;
-        tieneIGV = true;
-        cuentaIGV = "40111";
-        helperIGV = "IGV - Cuenta propia (Crédito Fiscal)";
-      } else if (vals.igvCond === "gravada_sin_credito") {
-        igv = valor * 0.18;
-        tieneIGV = true;
-        cuentaIGV = "1673";
-        helperIGV = "IGV por acreditar en compras";
-      }
-      
-      const precio = valor + igv;
-      
-      // Determinar cuentas por pagar
-      const cuentaPagar = vals.porPagar === "relacionadas" ? "43xx" : "42xx";
-      const helperPagar = vals.porPagar === "relacionadas" 
-        ? "Cuentas por pagar comerciales - Relacionadas" 
-        : "Cuentas por pagar comerciales - Terceros";
-        
-      // Determinar cuentas del bien (con marcadores de posición 60xx, 2xxx, 61xx)
-      const cuentaCompra = "60xx";
-      const cuentaAlmacen = "2xxx";
-      const cuentaVariacion = "61xx";
-      
-      let descCompra = "Compra de mercadería";
-      let descAlmacen = "Mercaderías manufacturadas - Costo";
-      let descVariacion = "Variación de mercaderías";
-      
-      if (vals.tipo === "materia_prima") {
-        descCompra = "Compra de materia prima";
-        descAlmacen = "Materias primas para prod. manufacturados";
-        descVariacion = "Variación de materias primas";
-      } else if (vals.tipo === "suministros") {
-        descCompra = "Compra de repuestos/suministros";
-        descAlmacen = "Otros suministros - Almacén";
-        descVariacion = "Variación de materiales aux, suministros y repuestos";
-      }
-
-      // Estructurar asientos
-      const entriesNaturaleza = [
-        { code: cuentaCompra, type: "debe", value: valor, helper: descCompra }
-      ];
-      if (tieneIGV) {
-        entriesNaturaleza.push({ code: cuentaIGV, type: "debe", value: igv, helper: helperIGV });
-      }
-      entriesNaturaleza.push({ code: cuentaPagar, type: "haber", value: precio, helper: helperPagar });
-
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Compra de activos realizables)",
-            entries: entriesNaturaleza
-          },
-          {
-            title: "Asiento de Destino (Ingreso al almacén)",
-            entries: [
-              { code: cuentaAlmacen, type: "debe", value: valor, helper: descAlmacen },
-              { code: cuentaVariacion, type: "haber", value: valor, helper: descVariacion }
-            ]
-          }
+    name: "Anticipo de clientes",
+    description: "Registro del dinero recibido de un cliente de manera anticipada antes de emitir la factura de venta.",
+    blocks: [
+      {
+        title: "5. Anticipo de clientes",
+        entries: [
+          { code: "1212/1312", type: "debe", value: "Importe Total" },
+          { code: "40111", type: "haber", value: "IGV" },
+          { code: "122/132", type: "haber", value: "Valor venta" }
         ]
-      };
-    }
+      }
+    ]
   },
   {
     id: 6,
-    name: "Compra de activos inmovilizados (PPE)",
-    description: "Adquisición de propiedad, planta y equipo (maquinaria, vehículos, muebles) para uso de la empresa.",
-    inputTemplate: "compra_ppe",
-    defaultValues: { valor: 33037.20 },
-    calculate: (vals) => {
-      const valor = vals.valor;
-      const igv = valor * 0.18;
-      const precio = valor + igv;
-      
-      return {
-        blocks: [
-          {
-            title: "Asiento de Naturaleza (Compra de Propiedad, Planta y Equipo)",
-            entries: [
-              { code: "3xxx", type: "debe", value: valor, helper: "Propiedad, planta y equipo - Costo" },
-              { code: "40xx", type: "debe", value: igv, helper: "IGV - Crédito Fiscal" },
-              { code: "465x", type: "haber", value: precio, helper: "Cuentas por pagar diversas - Activos" }
-            ]
-          }
+    name: "Anticipo a proveedores",
+    description: "Registro de los adelantos de dinero entregados a proveedores antes del despacho del bien o servicio.",
+    blocks: [
+      {
+        title: "6. Anticipo a proveedores",
+        entries: [
+          { code: "422/432", type: "debe", value: "Valor venta" },
+          { code: "40111", type: "debe", value: "IGV" },
+          { code: "4212/4312", type: "haber", value: "Importe Total" }
         ]
-      };
-    }
+      }
+    ]
+  },
+  {
+    id: 7,
+    name: "Compra de activo inmovilizado",
+    description: "Adquisición de bienes de propiedad, planta y equipo (PPE) destinados al uso de la empresa.",
+    blocks: [
+      {
+        title: "7. Compra de activo inmovilizado",
+        entries: [
+          { code: "3XXX", type: "debe", value: "Valor venta" },
+          { code: "40111", type: "debe", value: "IGV" },
+          { code: "465X/477X", type: "haber", value: "Importe Total" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 8,
+    name: "Préstamos / Adelanto a trabajadores",
+    description: "Registro del préstamo o adelanto de remuneraciones otorgado al personal de la empresa.",
+    blocks: [
+      {
+        title: "8. Préstamos / Adelanto a trabajadores",
+        entries: [
+          { code: "14XX", type: "debe", value: "XXXX" },
+          { code: "10XX", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 9,
+    name: "Movimiento de dinero",
+    description: "Transferencia de fondos entre cuentas de efectivo y equivalentes de efectivo (caja a bancos o viceversa).",
+    blocks: [
+      {
+        title: "9. Movimiento de dinero",
+        entries: [
+          { code: "10XX", type: "debe", value: "XXXX" },
+          { code: "10XX", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 10,
+    name: "Préstamos a empresas / entregas a rendir",
+    description: "Registro de préstamos otorgados a entidades relacionadas o entregas de dinero para gastos a rendir cuenta.",
+    blocks: [
+      {
+        title: "10. Préstamos a empresas / entregas a rendir",
+        entries: [
+          { code: "16XX/17XX", type: "debe", value: "XXXX" },
+          { code: "10XX", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 11,
+    name: "Pago de ITAN / Pago a cuenta del IR",
+    description: "Registro del pago del Impuesto Temporal a los Activos Netos (ITAN) o pagos mensuales a cuenta del Impuesto a la Renta.",
+    blocks: [
+      {
+        title: "11. Pago de ITAN / Pago a cuenta del IR",
+        entries: [
+          { code: "167X", type: "debe", value: "XXXX" },
+          { code: "10XX", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 12,
+    name: "Incremento de Capital",
+    description: "Registro contable del aumento de capital social de la empresa, cubriendo el acuerdo, el cobro de aportes y la regularización en registros públicos.",
+    blocks: [
+      {
+        title: "12.1. Por el acuerdo",
+        entries: [
+          { code: "1421", type: "debe", value: "XXXX" },
+          { code: "522X", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "12.2. Por el cobro",
+        entries: [
+          { code: "1XX, 2XX, 3XX", type: "debe", value: "XXXX" },
+          { code: "1421", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "12.3. Por la regularización",
+        entries: [
+          { code: "522X", type: "debe", value: "XXXX" },
+          { code: "501X", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 13,
+    name: "Reserva Legal",
+    description: "Detracción obligatoria de las utilidades del ejercicio para constituir la reserva legal conforme a la Ley General de Sociedades.",
+    blocks: [
+      {
+        title: "13. Reserva Legal",
+        entries: [
+          { code: "5911", type: "debe", value: "XXXX" },
+          { code: "58X", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 14,
+    name: "Consumo de suministros",
+    description: "Registro de la salida y consumo de materiales auxiliares, suministros o repuestos del almacén.",
+    blocks: [
+      {
+        title: "14. Consumo de suministros (Naturaleza)",
+        entries: [
+          { code: "61XX", type: "debe", value: "XXXX" },
+          { code: "2XXX", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "14. Consumo de suministros (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "XXXX" },
+          { code: "791", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 15,
+    name: "Servicios prestados por Terceros / Otros Gastos",
+    description: "Registro de gastos por servicios de terceros (luz, agua, alquileres) u otros gastos de gestión, con su destino correspondiente.",
+    blocks: [
+      {
+        title: "15.1. Asiento de Naturaleza",
+        entries: [
+          { code: "63XX/65XX", type: "debe", value: "Valor venta" },
+          { code: "40111", type: "debe", value: "IGV" },
+          { code: "4212/4312", type: "haber", value: "Importe Total" }
+        ]
+      },
+      {
+        title: "15.2. Asiento de Destino",
+        entries: [
+          { code: "9XX", type: "debe", value: "Valor venta" },
+          { code: "791", type: "haber", value: "Valor venta" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 16,
+    name: "Gastos del personal",
+    description: "Registro de la planilla de sueldos y salarios, descuentos de ley, aportes del empleador y beneficios sociales con sus destinos.",
+    blocks: [
+      {
+        title: "16.1. Ingresos y descuentos (Planilla)",
+        entries: [
+          { code: "6211", type: "debe", value: "Rem Bruta" },
+          { code: "4031", type: "haber", value: "ONP" },
+          { code: "4111", type: "haber", value: "Rem Neta" },
+          { code: "417", type: "haber", value: "AFP" }
+        ]
+      },
+      {
+        title: "16.1. Ingresos y descuentos (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "Rem Bruta" },
+          { code: "791", type: "haber", value: "Rem Bruta" }
+        ]
+      },
+      {
+        title: "16.2. Aportes del Empleador (Aportes)",
+        entries: [
+          { code: "627X", type: "debe", value: "Aporte" },
+          { code: "403X/4212", type: "haber", value: "Aporte" }
+        ]
+      },
+      {
+        title: "16.2. Aportes del Empleador (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "Aporte" },
+          { code: "791", type: "haber", value: "Aporte" }
+        ]
+      },
+      {
+        title: "16.3. Beneficios Sociales (Beneficios)",
+        entries: [
+          { code: "62XX", type: "debe", value: "Rem Bruta" },
+          { code: "41XX", type: "haber", value: "Aporte" }
+        ]
+      },
+      {
+        title: "16.3. Beneficios Sociales (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "Rem Bruta" },
+          { code: "791", type: "haber", value: "Valor venta" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 17,
+    name: "Gastos Tributarios",
+    description: "Registro contable de los gastos por tributos (como el Impuesto General a las Ventas no computable, arbitrios, entre otros).",
+    blocks: [
+      {
+        title: "17. Gastos Tributarios (Naturaleza)",
+        entries: [
+          { code: "64XX", type: "debe", value: "XXXX" },
+          { code: "40XX", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "17. Gastos Tributarios (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "XXXX" },
+          { code: "791", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 18,
+    name: "Costo de Ventas",
+    description: "Registro de la salida de existencias de mercaderías del almacén por el costo de venta correspondiente.",
+    blocks: [
+      {
+        title: "18. Costo de Ventas",
+        entries: [
+          { code: "69XX", type: "debe", value: "XXXX" },
+          { code: "2XXX", type: "haber", value: "Tributo" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 19,
+    name: "Gastos pagados por anticipado",
+    description: "Registro de seguros, alquileres o servicios contratados por anticipado y su devengo periódico.",
+    blocks: [
+      {
+        title: "19.1. Contrato",
+        entries: [
+          { code: "18XX", type: "debe", value: "Valor venta" },
+          { code: "40111", type: "debe", value: "IGV" },
+          { code: "4212/4312", type: "haber", value: "Importe Total" }
+        ]
+      },
+      {
+        title: "19.2. Devengado (Gasto)",
+        entries: [
+          { code: "65X/63X", type: "debe", value: "Valor venta/n" },
+          { code: "18XX", type: "haber", value: "Valor venta/n" }
+        ]
+      },
+      {
+        title: "19.2. Devengado (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "Valor venta/n" },
+          { code: "791", type: "haber", value: "Valor venta/n" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 20,
+    name: "Estimación de Cobranza Dudosa",
+    description: "Provisión por cuentas de cobranza dudosa, su destino, y su posterior castigo o recuperación.",
+    blocks: [
+      {
+        title: "20.1. Estimación (Provisión)",
+        entries: [
+          { code: "687X", type: "debe", value: "XXXX" },
+          { code: "19XX", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "20.1. Estimación (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "XXXX" },
+          { code: "781", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "20.2. Castigo",
+        entries: [
+          { code: "19XX", type: "debe", value: "XXXX" },
+          { code: "1XXX", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "20.2. Recuperación (en caso no se castigue)",
+        entries: [
+          { code: "19XX", type: "debe", value: "XXXX" },
+          { code: "755X", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 21,
+    name: "Desvalorización de Inventarios",
+    description: "Reconocimiento contable de la pérdida de valor de las mercaderías o materias primas en stock.",
+    blocks: [
+      {
+        title: "21. Desvalorización de Inventarios",
+        entries: [
+          { code: "695X", type: "debe", value: "XXXX" },
+          { code: "29XX", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 22,
+    name: "Depreciación / Amortización",
+    description: "Cálculo de la pérdida de valor de activos inmovilizados y su correspondiente distribución de costos.",
+    blocks: [
+      {
+        title: "22. Depreciación / Amortización (Provisión)",
+        entries: [
+          { code: "68XX", type: "debe", value: "XXXX" },
+          { code: "39XX", type: "haber", value: "XXXX" }
+        ]
+      },
+      {
+        title: "22. Depreciación / Amortización (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "XXXX" },
+          { code: "781", type: "haber", value: "XXXX" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 23,
+    name: "Venta de activos inmovilizados",
+    description: "Reclasificación, enajenación y retiro contable de bienes de propiedad, planta y equipo.",
+    blocks: [
+      {
+        title: "24.1. Reclasificación de activo inmovilizado",
+        entries: [
+          { code: "27XX", type: "debe", value: "Valor en Libros" },
+          { code: "39XX", type: "debe", value: "Depre Acumulada" },
+          { code: "33XX", type: "haber", value: "Costo Adquisición" }
+        ]
+      },
+      {
+        title: "24.2. Venta del activo",
+        entries: [
+          { code: "165X/175X", type: "debe", value: "Importe Total" },
+          { code: "40111", type: "haber", value: "IGV" },
+          { code: "756X", type: "haber", value: "Valor venta" }
+        ]
+      },
+      {
+        title: "24.3. Costo de enajenación (Gasto)",
+        entries: [
+          { code: "655X", type: "debe", value: "Valor en Libros" },
+          { code: "27XX", type: "haber", value: "Valor en Libros" }
+        ]
+      },
+      {
+        title: "24.3. Costo de enajenación (Destino)",
+        entries: [
+          { code: "9XX", type: "debe", value: "Valor en Libros" },
+          { code: "791", type: "haber", value: "Valor en Libros" }
+        ]
+      }
+    ]
   }
 ];
 
@@ -716,22 +930,56 @@ function setupTheme() {
 }
 
 // Renderizar menú principal con las 15 operaciones
+// Renderizar menú principal con las 16 operaciones contables
 function renderOperationsList() {
   const menuContainer = document.getElementById("operations-menu");
   menuContainer.innerHTML = "";
   
+  const operationIcons = {
+    1: "📂",
+    2: "📦",
+    3: "💰",
+    4: "💸",
+    5: "📥",
+    6: "📤",
+    7: "🏗️",
+    8: "🧑‍💼",
+    9: "🔄",
+    10: "🏢",
+    11: "🏛️",
+    12: "📈",
+    13: "🔒",
+    14: "📝",
+    15: "🛠️",
+    16: "👥",
+    17: "⚖️",
+    18: "🏷️",
+    19: "📅",
+    20: "⚠️",
+    21: "📉",
+    22: "⏳",
+    23: "🔨"
+  };
+  
   operations.forEach(op => {
     const btn = document.createElement("button");
-    btn.className = "op-menu-item";
+    btn.className = "op-menu-item certus-pill-btn";
     btn.onclick = () => {
       selectOperation(op.id);
       navigateTo("op-detail");
     };
     
+    const icon = operationIcons[op.id] || "💼";
+    
     btn.innerHTML = `
-      <span class="op-menu-num">${op.id}</span>
-      <span class="op-menu-name">${op.name}</span>
-      <span class="op-menu-arrow">→</span>
+      <div class="op-menu-left-pill">
+        <span class="op-menu-num">${op.id}</span>
+        <span class="op-menu-icon">${icon}</span>
+      </div>
+      <div class="op-menu-right-pill">
+        <span class="op-menu-name">${op.name}</span>
+        <span class="op-menu-arrow">→</span>
+      </div>
     `;
     menuContainer.appendChild(btn);
   });
@@ -975,8 +1223,30 @@ function renderInputs(op) {
   } else if (op.inputTemplate === "gastos_servicios") {
     inputsContainer.innerHTML = `
       <div class="input-group">
-        <label for="input-valor">Valor del Servicio (Neto S/)</label>
-        <input type="number" id="input-valor" class="calc-input" value="${op.defaultValues.valor}" min="0">
+        <label for="input-valor">Valor del Servicio / Gasto (Neto S/)</label>
+        <input type="number" id="input-valor" class="calc-input" value="${op.defaultValues.valor}" min="0" step="0.01">
+      </div>
+      <div class="input-group">
+        <label for="input-tipo-gasto">Tipo de Gasto</label>
+        <select id="input-tipo-gasto" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="servicios" ${op.defaultValues.tipoGasto === 'servicios' ? 'selected' : ''}>Servicios de Terceros (C-63)</option>
+          <option value="otros" ${op.defaultValues.tipoGasto === 'otros' ? 'selected' : ''}>Otros Gastos de Gestión (C-65)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="input-igv-cond">Condición de IGV</label>
+        <select id="input-igv-cond" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="gravada_credito" ${op.defaultValues.igvCond === 'gravada_credito' ? 'selected' : ''}>Gravada con IGV (Con Crédito Fiscal - C-40111)</option>
+          <option value="gravada_sin_credito" ${op.defaultValues.igvCond === 'gravada_sin_credito' ? 'selected' : ''}>Gravada con IGV (Sin Crédito Fiscal / C-1673)</option>
+          <option value="no_gravada" ${op.defaultValues.igvCond === 'no_gravada' ? 'selected' : ''}>No Gravada con IGV</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="input-por-pagar">Cuenta por Pagar</label>
+        <select id="input-por-pagar" class="calc-input" style="font-size: 0.95rem; font-weight: normal; padding: 0.5rem 0.75rem; background: var(--bg-input);">
+          <option value="terceros" ${op.defaultValues.porPagar === 'terceros' ? 'selected' : ''}>Comerciales Terceros (C-4212)</option>
+          <option value="relacionadas" ${op.defaultValues.porPagar === 'relacionadas' ? 'selected' : ''}>Comerciales Relacionadas (C-4312)</option>
+        </select>
       </div>
       <div class="input-group">
         <label for="input-area">Destino del Gasto</label>
@@ -1161,6 +1431,9 @@ function getValuesFromInputs(op) {
   } else if (op.inputTemplate === "gastos_servicios") {
     return {
       valor: Number(document.getElementById("input-valor").value) || 0,
+      tipoGasto: document.getElementById("input-tipo-gasto").value,
+      igvCond: document.getElementById("input-igv-cond").value,
+      porPagar: document.getElementById("input-por-pagar").value,
       area: document.getElementById("input-area").value
     };
   } else if (op.inputTemplate === "compra_ppe") {
@@ -1207,51 +1480,20 @@ function getValuesFromInputs(op) {
 // Recalcular y pintar el asiento en la vista detallada
 async function updateLedger(op) {
   document.getElementById("op-title").textContent = op.name;
-  document.getElementById("op-description").textContent = op.description;
+  document.getElementById("op-description").textContent = op.description || "";
   
-  const inputs = getValuesFromInputs(op);
-  const calculations = op.calculate(inputs);
-  
-  // Resumen Dinámico Horizontal
-  renderSummary(op, inputs);
-  
-  // Inicializar o actualizar sessionLedgerBlocks
-  const newBlocks = op.inputTemplate === "apertura"
-    ? [{ title: "Asiento de Apertura Inicial", entries: calculations.entries }]
-    : calculations.blocks;
-    
-  if (!sessionLedgerBlocks) {
-    sessionLedgerBlocks = newBlocks.map(b => ({
-      title: b.title,
-      entries: b.entries.map(e => ({
-        code: e.code,
-        type: e.type,
-        value: e.value,
-        helper: e.helper,
-        isCustom: false,
-        codeEdited: false,
-        valueEdited: false
-      }))
-    }));
-  } else {
-    // Si ya existe, actualizamos los valores de las filas predeterminadas
-    newBlocks.forEach((newBlock, bIdx) => {
-      const sessionBlock = sessionLedgerBlocks[bIdx];
-      if (!sessionBlock) return;
-      
-      const defaultSessionEntries = sessionBlock.entries.filter(e => !e.isCustom);
-      newBlock.entries.forEach((newEntry, eIdx) => {
-        if (defaultSessionEntries[eIdx]) {
-          if (!defaultSessionEntries[eIdx].valueEdited) {
-            defaultSessionEntries[eIdx].value = newEntry.value;
-          }
-          if (!defaultSessionEntries[eIdx].codeEdited) {
-            defaultSessionEntries[eIdx].code = newEntry.code;
-          }
-        }
-      });
-    });
-  }
+  sessionLedgerBlocks = op.blocks.map(b => ({
+    title: b.title,
+    entries: b.entries.map(e => ({
+      code: e.code,
+      type: e.type,
+      value: e.value,
+      helper: e.helper || "",
+      isCustom: false,
+      codeEdited: false,
+      valueEdited: false
+    }))
+  }));
   
   const ledgerView = document.getElementById("ledger-view");
   ledgerView.innerHTML = "";
@@ -1322,7 +1564,7 @@ function renderSummary(op, inputs) {
     sumVal3.textContent = formatter.format(calcVal);
     sumVal3.style.color = "var(--primary)";
 
-  } else if (op.inputTemplate === "compra_almacenada") {
+  } else if (op.inputTemplate === "compra_almacenada" || op.inputTemplate === "gastos_servicios") {
     const valor = inputs.valor || 0;
     let igv = 0;
     if (inputs.igvCond === "gravada_credito" || inputs.igvCond === "gravada_sin_credito") {
@@ -1338,7 +1580,7 @@ function renderSummary(op, inputs) {
     sumVal3.textContent = formatter.format(total);
     sumVal3.style.color = "var(--primary)";
     
-  } else if (op.inputTemplate === "compra_inmediata" || op.inputTemplate === "gastos_servicios" || op.inputTemplate === "compra_ppe") {
+  } else if (op.inputTemplate === "compra_inmediata" || op.inputTemplate === "compra_ppe") {
     
   } else if (op.inputTemplate === "venta") {
     const valor = inputs.valor || 0;
@@ -1467,371 +1709,70 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
       <table class="ledger-table">
         <thead>
           <tr>
-            <th style="width: 20%;">CODIGO</th>
-            <th style="width: 45%;">DENOMINACION</th>
-            <th style="width: 15%;">DEBE</th>
-            <th style="width: 15%;">HABER</th>
-            <th style="width: 5%;"></th>
+            <th style="width: 34%;">CÓDIGO</th>
+            <th style="width: 33%;">DEBE</th>
+            <th style="width: 33%;">HABER</th>
           </tr>
         </thead>
         <tbody class="ledger-rows-container"></tbody>
-        <tfoot>
-          <tr style="border-top: 2px solid var(--border); font-weight: 700;">
-            <td colspan="2" style="text-align: right; padding: 0.5rem 0.75rem;">Total:</td>
-            <td class="ledger-total-debe center" style="color: var(--debe); padding: 0.5rem 0.75rem;">S/ 0.00</td>
-            <td class="ledger-total-haber center" style="color: var(--haber); padding: 0.5rem 0.75rem;">S/ 0.00</td>
-            <td></td>
-          </tr>
-          <tr>
-            <td colspan="5" class="ledger-balance-status center" style="padding: 0.5rem; font-size: 0.85rem; font-weight: bold; border-radius: 8px; text-align: center; line-height: 1.5;">
-              <!-- Estado de balance -->
-            </td>
-          </tr>
-        </tfoot>
       </table>
     </div>
   `;
   
   const rowsContainer = blockDiv.querySelector(".ledger-rows-container");
   
-  function createDividerRow(bIdx, insertIdx) {
-    const tr = document.createElement("tr");
-    tr.className = "add-row-tr";
-    tr.innerHTML = `
-      <td colspan="5">
-        <div class="add-row-divider">
-          <button class="btn-add-row" data-block-idx="${bIdx}" data-insert-idx="${insertIdx}" type="button" title="Insertar Fila">+</button>
-        </div>
-      </td>
-    `;
-    return tr;
-  }
-  
-  // Función interna para determinar el texto del placeholder contable
-  function getPlaceholderText(code, type) {
-    if (!code) return "";
-    const cleanCode = code.replace(/X/gi, '');
-    if (cleanCode.startsWith("3") || cleanCode.startsWith("60")) {
-      return type === "debe" ? "VC" : "";
-    }
-    if (cleanCode.startsWith("4011") || cleanCode.startsWith("40")) {
-      return "IGV";
-    }
-    if (cleanCode.startsWith("42") || cleanCode.startsWith("46")) {
-      return type === "haber" ? "PC" : "";
-    }
-    if (cleanCode.startsWith("12")) {
-      return type === "debe" ? "PV" : "";
-    }
-    if (cleanCode.startsWith("70")) {
-      return type === "haber" ? "VV" : "";
-    }
-    return "";
-  }
-  
-  // Limpiar e inicializar tbody con el divisor inicial
-  rowsContainer.innerHTML = "";
-  rowsContainer.appendChild(createDividerRow(blockIdx, 0));
-  
   for (let entryIdx = 0; entryIdx < block.entries.length; entryIdx++) {
     const entry = block.entries[entryIdx];
     const code = entry.code || "";
-    const officialDesc = await getAccountDescription(code);
+    const type = entry.type || "debe";
+    const displayAmount = entry.value || "XXXX";
+    
+    // Determinar clase de color según el valor de la plantilla y el tipo
+    let cellClass = "val-xxxx";
+    const opId = op ? Number(op.id) : 0;
+    
+    if (displayAmount === "Valor venta" || displayAmount === "Valor venta/n") {
+      cellClass = "val-venta";
+    } else if (displayAmount === "IGV") {
+      cellClass = "val-igv";
+    } else if (displayAmount === "Importe Total") {
+      cellClass = "val-total";
+    } else if (displayAmount === "Rem Bruta" || displayAmount === "Aporte" || displayAmount === "Valor en Libros" || displayAmount === "Depre Acumulada") {
+      cellClass = type === "debe" ? "val-xxxx-debe" : "val-xxxx-haber";
+    } else if (displayAmount === "AFP") {
+      cellClass = "val-xxxx-debe";
+    } else if (displayAmount === "ONP" || displayAmount === "Rem Neta" || displayAmount === "IR 5ta categoría" || displayAmount === "Costo Adquisición" || displayAmount === "Tributo") {
+      cellClass = "val-xxxx-haber";
+    } else if (displayAmount === "XXXX") {
+      if (opId === 8 || opId === 9 || opId === 10 || opId === 11 || opId === 13) {
+        cellClass = "val-xxxx-debe";
+      } else if (opId === 12 || opId === 14) {
+        cellClass = "val-xxxx-haber";
+      } else {
+        cellClass = type === "debe" ? "val-xxxx-debe" : "val-xxxx-haber";
+      }
+    }
     
     const tr = document.createElement("tr");
     
-    // Renderizamos inputs en ambas columnas (Debe y Haber) para todas las filas
-    const debeValue = (entry.type === "debe" && entry.value !== undefined && entry.value !== null) ? entry.value : "";
-    const haberValue = (entry.type === "haber" && entry.value !== undefined && entry.value !== null) ? entry.value : "";
-    
-    const debeCell = `<input type="number" class="ledger-amount-input" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="debe" placeholder="${getPlaceholderText(code, "debe")}" value="${debeValue}">`;
-    const haberCell = `<input type="number" class="ledger-amount-input" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" data-type="haber" placeholder="${getPlaceholderText(code, "haber")}" value="${haberValue}">`;
-    
-    tr.innerHTML = `
-      <td class="center">
-        <div class="code-input-wrapper">
-          <input 
-            type="text" 
-            class="ledger-code-input" 
-            value="${code}" 
-            data-block-idx="${blockIdx}"
-            data-entry-idx="${entryIdx}" 
-            autocomplete="off"
-            aria-label="Código de cuenta"
-          >
-          <div class="suggestions-list"></div>
-        </div>
-      </td>
-      <td>
-        <span class="desc-official" style="font-size: 0.8rem; font-weight: 500;">${officialDesc}</span>
-      </td>
-      <td class="center" style="font-size: 0.85rem; font-weight: 700; color: var(--debe);">
-        ${debeCell}
-      </td>
-      <td class="center" style="font-size: 0.85rem; font-weight: 700; color: var(--haber);">
-        ${haberCell}
-      </td>
-      <td class="center">
-        <button class="btn-delete-row" data-block-idx="${blockIdx}" data-entry-idx="${entryIdx}" type="button" title="Eliminar fila" style="background: none; border: none; color: var(--haber); font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: background 0.2s;">&times;</button>
-      </td>
-    `;
+    if (type === "debe") {
+      tr.innerHTML = `
+        <td class="code-cell">${code}</td>
+        <td class="value-cell ${cellClass}">${displayAmount}</td>
+        <td class="value-cell empty-cell"></td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td class="code-cell">${code}</td>
+        <td class="value-cell empty-cell"></td>
+        <td class="value-cell ${cellClass}">${displayAmount}</td>
+      `;
+    }
     
     rowsContainer.appendChild(tr);
-    
-    // Renderizar divisor después de la fila
-    rowsContainer.appendChild(createDividerRow(blockIdx, entryIdx + 1));
   }
   
   container.appendChild(blockDiv);
-  
-  // Vincular autocompletado Supabase
-  const codeInputs = blockDiv.querySelectorAll(".ledger-code-input");
-  codeInputs.forEach(input => {
-    const bIdx = Number(input.dataset.blockIdx);
-    const eIdx = Number(input.dataset.entryIdx);
-    const suggestionsList = input.nextElementSibling;
-    
-    let debounceTimer = null;
-    
-    input.addEventListener("input", (e) => {
-      let val = e.target.value;
-      clearTimeout(debounceTimer);
-      
-      // Permitir cualquier dígito ingresado, sin forzar formato template
-      const digits = val.replace(/[^0-9]/g, '');
-      if (input.value !== digits) {
-        input.value = digits;
-      }
-      val = digits;
-      
-      const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
-      entry.code = val;
-      entry.codeEdited = true;
-      
-      // Actualizar descripción en tiempo real
-      const descSpan = input.closest('tr').querySelector('.desc-official');
-      updateRealtimeDescription(val, descSpan);
-      
-      // Actualizar placeholders dinámicamente
-      const tr = input.closest('tr');
-      const debeInp = tr.querySelector('.ledger-amount-input[data-type="debe"]');
-      const haberInp = tr.querySelector('.ledger-amount-input[data-type="haber"]');
-      if (debeInp) debeInp.placeholder = getPlaceholderText(val, "debe");
-      if (haberInp) haberInp.placeholder = getPlaceholderText(val, "haber");
-      
-      if (val.length < 1) {
-        suggestionsList.classList.remove("show");
-        return;
-      }
-      
-      debounceTimer = setTimeout(async () => {
-        try {
-          const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/pcge_catalogo?codigo=like.${val}*&nivel=eq.${val.length + 1}&limit=15&order=codigo.asc`,
-            {
-              headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${SUPABASE_KEY}`
-              }
-            }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            renderSuggestions(data, input, suggestionsList, bIdx, eIdx);
-          }
-        } catch (error) {
-          console.error("Error al consultar autocompletado:", error);
-        }
-      }, 200);
-    });
-    
-    input.addEventListener("blur", () => {
-      setTimeout(() => {
-        suggestionsList.classList.remove("show");
-      }, 250);
-    });
-    
-    input.addEventListener("focus", () => {
-      let val = input.value.trim();
-      if (/[Xx]/.test(val)) {
-        // Remover X's al hacer foco para permitir escribir cómodamente
-        const newVal = val.replace(/X/gi, '');
-        input.value = newVal;
-        input.dispatchEvent(new Event("input"));
-      } else {
-        input.dispatchEvent(new Event("input"));
-      }
-    });
- 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        suggestionsList.classList.remove("show");
-      }
-    });
-  });
-  
-  // Vincular cambio de montos en Debe/Haber
-  const amountInputs = blockDiv.querySelectorAll(".ledger-amount-input");
-  amountInputs.forEach(input => {
-    input.addEventListener("input", (e) => {
-      const val = e.target.value;
-      const bIdx = Number(input.dataset.blockIdx);
-      const eIdx = Number(input.dataset.entryIdx);
-      const type = input.dataset.type;
-      
-      const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
-      entry.valueEdited = true;
-      
-      if (val === "") {
-        entry.value = "";
-      } else {
-        entry.type = type;
-        entry.value = parseFloat(val) || 0;
-        
-        // Limpiar la columna opuesta en el DOM y en el estado
-        const oppType = type === "debe" ? "haber" : "debe";
-        const oppInput = blockDiv.querySelector(`.ledger-amount-input[data-block-idx="${bIdx}"][data-entry-idx="${eIdx}"][data-type="${oppType}"]`);
-        if (oppInput) {
-          oppInput.value = "";
-        }
-      }
-      
-      // Recalcular totales en tiempo real
-      recalculateTotals();
-    });
-  });
-
-  // Vincular eliminación de fila
-  const deleteButtons = blockDiv.querySelectorAll(".btn-delete-row");
-  deleteButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const bIdx = Number(btn.dataset.blockIdx);
-      const eIdx = Number(btn.dataset.entryIdx);
-      
-      // Remover la fila de los datos de la sesión
-      sessionLedgerBlocks[bIdx].entries.splice(eIdx, 1);
-      
-      // Re-renderizar
-      if (op) {
-        updateLedger(op);
-      }
-    });
-  });
-
-  // Vincular adición de fila (múltiples botones de inserción)
-  const addButtons = blockDiv.querySelectorAll(".btn-add-row");
-  addButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const bIdx = Number(btn.dataset.blockIdx);
-      const insertIdx = Number(btn.dataset.insertIdx);
-      
-      // Insertar una nueva fila en la posición deseada
-      sessionLedgerBlocks[bIdx].entries.splice(insertIdx, 0, {
-        code: "",
-        type: "debe",
-        value: "",
-        helper: "Cuenta adicional",
-        isCustom: true
-      });
-      
-      // Re-renderizar
-      if (op) {
-        updateLedger(op);
-      }
-    });
-  });
-
-  // Función interna para recalcular totales del bloque en tiempo real
-  function recalculateTotals() {
-    let totalDebe = 0;
-    let totalHaber = 0;
-    
-    blockDiv.querySelectorAll(".ledger-amount-input").forEach(inp => {
-      const val = parseFloat(inp.value) || 0;
-      if (inp.dataset.type === "debe") {
-        totalDebe += val;
-      } else if (inp.dataset.type === "haber") {
-        totalHaber += val;
-      }
-    });
-    
-    const totalDebeEl = blockDiv.querySelector(".ledger-total-debe");
-    const totalHaberEl = blockDiv.querySelector(".ledger-total-haber");
-    const balanceStatusEl = blockDiv.querySelector(".ledger-balance-status");
-    
-    const formatter = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
-    
-    if (totalDebeEl) totalDebeEl.textContent = formatter.format(totalDebe);
-    if (totalHaberEl) totalHaberEl.textContent = formatter.format(totalHaber);
-    
-    if (balanceStatusEl) {
-      const diff = Math.abs(totalDebe - totalHaber);
-      if (diff < 0.01) {
-        balanceStatusEl.textContent = "✔ OK (Cuadrado)";
-        balanceStatusEl.style.color = "#22c55e";
-        balanceStatusEl.style.backgroundColor = "rgba(34, 197, 94, 0.1)";
-      } else {
-        balanceStatusEl.textContent = `⚠ Desbalance: ${formatter.format(diff)}`;
-        balanceStatusEl.style.color = "#ef4444";
-        balanceStatusEl.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
-      }
-    }
-  }
-
-  // Renderizar las sugerencias flotantes del ledger
-  function renderSuggestions(data, input, suggestionsList, bIdx, eIdx) {
-    suggestionsList.innerHTML = "";
-    
-    if (!data || data.length === 0) {
-      suggestionsList.classList.remove("show");
-      return;
-    }
-    
-    data.forEach(item => {
-      const btn = document.createElement("button");
-      btn.className = "suggestion-item";
-      btn.type = "button";
-      btn.innerHTML = `
-        <span class="sugg-code" style="font-weight: 700; color: var(--primary); flex-shrink: 0; margin-right: 0.5rem;">${item.codigo}</span>
-        <span class="sugg-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;" title="${item.descripcion}">${item.descripcion}</span>
-      `;
-      
-      btn.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-      });
-      
-      btn.addEventListener("click", async () => {
-        const selectedCode = item.codigo;
-        input.value = selectedCode;
-        suggestionsList.classList.remove("show");
-        
-        const entry = sessionLedgerBlocks[bIdx].entries[eIdx];
-        entry.code = selectedCode;
-        entry.codeEdited = true;
-        
-        accountCache[selectedCode] = item.descripcion;
-        
-        const descSpan = input.closest('tr').querySelector('.desc-official');
-        if (descSpan) descSpan.textContent = item.descripcion;
-        
-        // Actualizar placeholders dinámicamente al seleccionar código
-        const tr = input.closest('tr');
-        const debeInp = tr.querySelector('.ledger-amount-input[data-type="debe"]');
-        const haberInp = tr.querySelector('.ledger-amount-input[data-type="haber"]');
-        if (debeInp) debeInp.placeholder = getPlaceholderText(selectedCode, "debe");
-        if (haberInp) haberInp.placeholder = getPlaceholderText(selectedCode, "haber");
-        
-        recalculateTotals();
-      });
-      
-      suggestionsList.appendChild(btn);
-    });
-    
-    suggestionsList.classList.add("show");
-  }
-
-  // Ejecutar recálculo inicial
-  recalculateTotals();
 }
 
 // ===== SISTEMA EXPLORADOR PCGE JERÁRQUICO (PANTALLA 3) =====

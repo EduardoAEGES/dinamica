@@ -18,9 +18,9 @@
   --text-muted: #64748b;
   --text-inverse: #ffffff;
   
-  --primary: #10b981; /* Verde esmeralda para contabilidad */
-  --primary-hover: #059669;
-  --primary-light: #d1fae5;
+  --primary: #001a68; /* Azul Certus */
+  --primary-hover: #001147;
+  --primary-light: #e0eaff;
   
   --debe: #0284c7; /* Azul para el Debe */
   --debe-light: #e0f2fe;
@@ -33,7 +33,7 @@
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  --glow-primary: 0 0 15px rgba(16, 185, 129, 0.2);
+  --glow-primary: 0 0 15px rgba(0, 26, 104, 0.2);
 }
 
 [data-theme="dark"] {
@@ -48,9 +48,9 @@
   --text-muted: #94a3b8;
   --text-inverse: #0f172a;
   
-  --primary: #34d399;
-  --primary-hover: #10b981;
-  --primary-light: rgba(16, 185, 129, 0.15);
+  --primary: #4f87ff;
+  --primary-hover: #3b70e0;
+  --primary-light: rgba(79, 135, 255, 0.15);
   
   --debe: #38bdf8;
   --debe-light: rgba(56, 189, 248, 0.12);
@@ -331,53 +331,124 @@ header {
 .operations-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-bottom: 1.5rem;
+  gap: 1rem; /* More space between buttons */
+  padding-bottom: 2rem;
 }
 
-.op-menu-item {
+.op-menu-item.certus-pill-btn {
+  display: flex;
+  align-items: center; /* Vertically center children */
+  padding: 0;
+  background: var(--bg-input);
+  border: 2px solid #001a68;
+  border-radius: 28px; /* Dynamic pill shape */
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 56px; /* Dynamic height */
+  height: auto;
+  width: 100%;
+}
+
+.op-menu-left-pill {
+  background-color: #001a68;
+  color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  cursor: pointer;
-  text-align: left;
-  box-shadow: var(--shadow-sm);
-}
-
-.op-menu-item:hover, .op-menu-item:active {
-  background: var(--bg-card-hover);
-  transform: scale(0.99);
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem 0.5rem 1.25rem;
+  font-family: var(--font-title);
+  font-weight: 800;
+  font-size: 0.88rem;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  min-width: 88px;
+  align-self: stretch; /* Stretches left bar to full height of parent button */
+  box-sizing: border-box;
 }
 
 .op-menu-num {
   font-family: var(--font-title);
-  font-weight: 700;
-  background: var(--primary);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  font-weight: 800;
+}
+
+.op-menu-icon {
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  flex-shrink: 0;
+}
+
+.op-menu-right-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.25rem 0.6rem 0.95rem; /* Padding for text wrapping */
+  background-color: var(--bg-input);
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  min-height: 56px;
 }
 
 .op-menu-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.82rem; /* Slightly smaller to fit mobile screens better */
+  font-weight: 700;
+  color: #001a68;
+  transition: all 0.25s ease;
+  text-align: left;
+  line-height: 1.35;
+  white-space: normal; /* Force text wrap */
   flex: 1;
+  padding-right: 0.5rem;
 }
 
 .op-menu-arrow {
-  color: var(--text-muted);
+  color: #001a68;
   font-size: 1rem;
+  font-weight: 800;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+/* Hover effects */
+.op-menu-item.certus-pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #001147;
+}
+
+.op-menu-item.certus-pill-btn:hover .op-menu-left-pill {
+  background-color: #001147;
+}
+
+.op-menu-item.certus-pill-btn:hover .op-menu-right-pill {
+  background-color: #f0f4ff; /* Light blue tint on hover */
+}
+
+/* Dark theme support */
+[data-theme="dark"] .op-menu-item.certus-pill-btn {
+  border-color: #4f87ff;
+}
+
+[data-theme="dark"] .op-menu-left-pill {
+  background-color: #4f87ff;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .op-menu-name,
+[data-theme="dark"] .op-menu-arrow {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .op-menu-item.certus-pill-btn:hover .op-menu-left-pill {
+  background-color: #3b70e0;
+}
+
+[data-theme="dark"] .op-menu-item.certus-pill-btn:hover .op-menu-right-pill {
+  background-color: #1e293b;
 }
 
 /* ===== PANTALLA 2: DETALLE DE OPERACIÓN ===== */
@@ -516,309 +587,119 @@ header {
   padding-left: 0.5rem;
 }
 
-/* Asiento Tipo Tabla (Classical Grid) al estilo de la segunda imagen */
+/* ===== TARJETAS DE ASIENTOS CONTABLES (RESPONSIVE CARDS & CUENTA T) ===== */
+/* ===== TABLAS CONTABLES CLÁSICAS (CUADRITOS) ===== */
 .ledger-table-wrapper {
   width: 100%;
-  max-width: 100%;
-  min-width: 0 !important;
-  box-sizing: border-box;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-top: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--bg-card);
   box-shadow: var(--shadow-sm);
-  background-color: var(--bg-input);
-}
-
-.ledger-table-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-
-.ledger-table-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ledger-table-wrapper::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-.ledger-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  box-sizing: border-box;
 }
 
 .ledger-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: var(--bg-input);
-}
-
-.ledger-table th, .ledger-table td {
-  border: 1px solid #1070ca; /* Borde azul clásico */
-  padding: 0.65rem 0.5rem;
-  vertical-align: middle;
-  text-align: left;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .ledger-table th {
-  background-color: #e0f2fe; /* Celeste suave para cabeceras */
-  color: #dc2626; /* Texto rojo bold */
+  background-color: #0b4c8c !important; /* Azul Certus/Contabilidad */
+  color: #ffffff !important;
   font-family: var(--font-title);
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.4rem;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  border: 1.5px solid #dc2626 !important; /* Borde rojo */
+  letter-spacing: 0.03em;
 }
 
-.ledger-table td.center {
+.ledger-table td {
+  padding: 0.5rem 0.4rem;
   text-align: center;
-}
-
-.ledger-table td.right {
-  text-align: right;
-}
-
-.ledger-table .code-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.ledger-table .ledger-code-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-family: var(--font-title);
+  font-size: 0.8rem;
+  border: 1.5px solid #dc2626 !important; /* Borde rojo */
   font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0.25rem 0.35rem;
-  text-align: center;
-  outline: none;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
-.ledger-table .ledger-code-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary-light);
-}
-
-.ledger-table .ledger-amount-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: var(--text-main);
-  font-family: var(--font-title);
+.ledger-table td.code-cell {
+  color: #0b4c8c !important; /* Código en azul */
+  font-family: var(--font-title), sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
-  text-align: center;
-  outline: none;
-  padding: 0.25rem;
+  background-color: #ffffff;
 }
 
-.ledger-table .ledger-amount-input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.7;
+.ledger-table td.value-cell {
+  font-size: 0.75rem;
 }
 
-.ledger-table .ledger-amount-input:focus {
-  background: var(--bg-input);
-  border-bottom: 2px solid var(--primary);
-  border-radius: 4px;
+.ledger-table td.empty-cell {
+  background-color: #ffffff;
 }
 
-@media (max-width: 767px) {
-  /* Ancho y scroll de la tabla */
-  .ledger-table {
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-  
-  /* Ajuste de anchos proporcionales de columnas para móviles */
-  .ledger-table th:nth-child(1),
-  .ledger-table td:nth-child(1) {
-    width: 18% !important; /* CODIGO */
-  }
-  .ledger-table th:nth-child(2),
-  .ledger-table td:nth-child(2) {
-    width: 32% !important; /* DENOMINACION */
-  }
-  .ledger-table th:nth-child(3),
-  .ledger-table td:nth-child(3) {
-    width: 22% !important; /* DEBE */
-  }
-  .ledger-table th:nth-child(4),
-  .ledger-table td:nth-child(4) {
-    width: 22% !important; /* HABER */
-  }
-  .ledger-table th:nth-child(5),
-  .ledger-table td:nth-child(5) {
-    width: 6% !important; /* ELIMINAR */
-  }
-
-  /* Reducir padding de celdas */
-  .ledger-table th, 
-  .ledger-table td {
-    padding: 0.35rem 0.2rem !important;
-    font-size: 0.72rem !important;
-  }
-  
-  .ledger-table th {
-    font-size: 0.7rem !important;
-  }
-
-  /* Hacer el input de código más compacto */
-  .ledger-table .ledger-code-input {
-    font-size: 0.78rem !important;
-    padding: 0.15rem 0.1rem !important;
-    border-radius: 3px !important;
-  }
-
-  /* Hacer los inputs de montos más compactos */
-  .ledger-table .ledger-amount-input {
-    font-size: 0.78rem !important;
-    padding: 0.15rem 0.05rem !important;
-  }
-  
-  /* Reducir la descripción oficial */
-  .ledger-table .desc-official {
-    font-size: 0.65rem !important;
-    line-height: 1.15 !important;
-    display: block;
-    word-break: break-word;
-  }
+/* Colores de fondo suave para las plantillas de cuentas */
+.val-xxxx-debe {
+  background-color: #e0f2fe !important; /* Celeste */
+  color: #0369a1 !important;
 }
 
-.ledger-table .btn-delete-row:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  color: #ef4444 !important;
+.val-xxxx-haber {
+  background-color: #dcfce7 !important; /* Verde */
+  color: #15803d !important;
 }
 
-.ledger-table tr.add-row-tr td {
-  border: none !important;
-  background: transparent !important;
-  padding: 0.15rem 0 !important;
+.val-venta {
+  background-color: #fef9c3 !important; /* Amarillo */
+  color: #854d0e !important;
 }
 
-.add-row-divider {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 16px;
-  margin: 0;
-  opacity: 0.25;
-  transition: opacity 0.2s;
+.val-igv {
+  background-color: #ffedd5 !important; /* Naranja */
+  color: #c2410c !important;
 }
 
-.add-row-divider:hover {
-  opacity: 1;
+.val-total {
+  background-color: #fce7f3 !important; /* Rosado */
+  color: #9d174d !important;
 }
 
-.add-row-divider::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  border-top: 1.5px dashed #22c55e;
-  z-index: 1;
+/* Adaptación del modo oscuro para el fondo de la tabla */
+[data-theme="dark"] .ledger-table {
+  background-color: #1e293b;
+}
+[data-theme="dark"] .ledger-table td.code-cell,
+[data-theme="dark"] .ledger-table td.empty-cell {
+  background-color: #1e293b;
+  color: #60a5fa !important;
+}
+[data-theme="dark"] .val-xxxx-debe {
+  background-color: #0369a1 !important;
+  color: #e0f2fe !important;
+}
+[data-theme="dark"] .val-xxxx-haber {
+  background-color: #15803d !important;
+  color: #dcfce7 !important;
+}
+[data-theme="dark"] .val-venta {
+  background-color: #854d0e !important;
+  color: #fef9c3 !important;
+}
+[data-theme="dark"] .val-igv {
+  background-color: #c2410c !important;
+  color: #ffedd5 !important;
+}
+[data-theme="dark"] .val-total {
+  background-color: #9d174d !important;
+  color: #fce7f3 !important;
 }
 
-.add-row-divider .btn-add-row {
-  position: relative;
-  z-index: 2;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: #22c55e;
-  color: white !important;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-  transition: transform 0.2s, background-color 0.2s;
-  padding: 0;
-  line-height: 1;
-}
 
-.add-row-divider .btn-add-row:hover {
-  background-color: #16a34a !important;
-  transform: scale(1.2);
-}
-
-.ledger-table .suggestions-list {
-  left: 50%;
-  transform: translateX(-50%);
-  width: 250px;
-}
-
-/* ===== SUGERENCIAS DROPDOWN AUTOCOMPLETE MÓVIL ===== */
-.suggestions-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 250px;
-  max-height: 180px;
-  overflow-y: auto;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: var(--shadow-lg);
-  z-index: 100;
-  margin-top: 4px;
-  display: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 0.25rem;
-}
-
-.suggestions-list.show {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.suggestion-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border: none;
-  background: transparent;
-  color: var(--text-main);
-  text-align: left;
-  font-family: inherit;
-  font-size: 0.95rem;
-  border-radius: 6px;
-  cursor: pointer;
-  gap: 0.5rem;
-}
-
-.suggestion-item:hover, .suggestion-item:active {
-  background: var(--primary-light);
-  color: var(--primary-hover);
-}
-
-.sugg-code {
-  font-family: var(--font-title);
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.sugg-desc {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 500;
-}
 
 /* ===== TAB 2: EXPLORADOR PCGE (MÓVIL) ===== */
 .pcge-search-wrapper {
@@ -2145,9 +2026,9 @@ body.is-mobile-device .bottom-nav {
 .pwa-card-purple { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); }
 .pwa-card-cyan { background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%); }
 
-/* Forzar cabecera en el color teal corporativo de la imagen */
+/* Forzar cabecera en el color azul corporativo de CERTUS */
 #app-header {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%) !important;
+  background: linear-gradient(135deg, #001a68 0%, #002c8c 100%) !important;
   color: #ffffff !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: var(--shadow-sm) !important;
@@ -2164,7 +2045,7 @@ body.is-mobile-device .bottom-nav {
 }
 
 [data-theme="dark"] #app-header {
-  background: linear-gradient(135deg, #0b665c 0%, #0d9488 100%) !important;
+  background: linear-gradient(135deg, #090d16 0%, #001a68 100%) !important;
 }
 
 /* Ocultar calculadora en detalle de operación */
@@ -2422,3 +2303,57 @@ body.is-mobile-device .bottom-nav {
   font-size: 0.75rem;
   font-weight: 700;
 }
+
+/* Ocultar la calculadora en la pantalla de detalle de operación */
+#screen-op-detail .calc-card {
+  display: none !important;
+}
+
+/* Estilos de Insignias de Plantilla para Asientos Tipo */
+.ledger-card-amount.template-amount {
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  display: inline-block;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Valor venta: Amarillo suave */
+.ledger-card-amount.template-amount.val-venta {
+  background-color: #fef9c3 !important; /* Yellow 100 */
+  color: #854d0e !important; /* Yellow 800 */
+  border-color: #fef08a !important;
+}
+
+/* IGV: Naranja suave */
+.ledger-card-amount.template-amount.val-igv {
+  background-color: #ffedd5 !important; /* Orange 100 */
+  color: #c2410c !important; /* Orange 700 */
+  border-color: #fed7aa !important;
+}
+
+/* Importe Total: Rosado/Púrpura suave */
+.ledger-card-amount.template-amount.val-total {
+  background-color: #fce7f3 !important; /* Pink 100 */
+  color: #9d174d !important; /* Pink 800 */
+  border-color: #fbcfe8 !important;
+}
+
+/* XXXX Debe: Celeste suave */
+.debe-card .ledger-card-amount.template-amount.val-xxxx {
+  background-color: #e0f2fe !important; /* Sky 100 */
+  color: #0369a1 !important; /* Sky 700 */
+  border-color: #bae6fd !important;
+}
+
+/* XXXX Haber: Verde suave */
+.haber-card .ledger-card-amount.template-amount.val-xxxx {
+  background-color: #dcfce7 !important; /* Green 100 */
+  color: #15803d !important; /* Green 700 */
+  border-color: #bbf7d0 !important;
+}
+
