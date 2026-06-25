@@ -444,15 +444,15 @@ const operations = [
       {
         title: "16.3. Beneficios Sociales (Beneficios)",
         entries: [
-          { code: "62XX", type: "debe", value: "Rem Bruta" },
-          { code: "41XX", type: "haber", value: "Aporte" }
+          { code: "62XX", type: "debe", value: "Beneficio" },
+          { code: "41XX", type: "haber", value: "Beneficio" }
         ]
       },
       {
         title: "16.3. Beneficios Sociales (Destino)",
         entries: [
-          { code: "9XX", type: "debe", value: "Rem Bruta" },
-          { code: "791", type: "haber", value: "Valor venta" }
+          { code: "9XX", type: "debe", value: "Beneficio" },
+          { code: "791", type: "haber", value: "Beneficio" }
         ]
       }
     ]
@@ -1731,17 +1731,17 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
     let cellClass = "val-xxxx";
     const opId = op ? Number(op.id) : 0;
     
-    if (displayAmount === "Valor venta" || displayAmount === "Valor venta/n") {
+    if (displayAmount === "Valor venta" || displayAmount === "Valor venta/n" || displayAmount === "Rem Bruta" || displayAmount === "Aporte" || displayAmount === "Beneficio") {
       cellClass = "val-venta";
     } else if (displayAmount === "IGV") {
       cellClass = "val-igv";
-    } else if (displayAmount === "Importe Total") {
+    } else if (displayAmount === "Importe Total" || displayAmount === "Rem Neta") {
       cellClass = "val-total";
-    } else if (displayAmount === "Rem Bruta" || displayAmount === "Aporte" || displayAmount === "Valor en Libros" || displayAmount === "Depre Acumulada") {
+    } else if (displayAmount === "Valor en Libros" || displayAmount === "Depre Acumulada") {
       cellClass = type === "debe" ? "val-xxxx-debe" : "val-xxxx-haber";
     } else if (displayAmount === "AFP") {
       cellClass = "val-xxxx-debe";
-    } else if (displayAmount === "ONP" || displayAmount === "Rem Neta" || displayAmount === "IR 5ta categoría" || displayAmount === "Costo Adquisición" || displayAmount === "Tributo") {
+    } else if (displayAmount === "ONP" || displayAmount === "IR 5ta categoría" || displayAmount === "Costo Adquisición" || displayAmount === "Tributo") {
       cellClass = "val-xxxx-haber";
     } else if (displayAmount === "XXXX") {
       if (opId === 8 || opId === 9 || opId === 10 || opId === 11 || opId === 13) {
