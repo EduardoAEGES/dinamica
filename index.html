@@ -283,6 +283,24 @@
               <!-- Lista de cuentas del PCGE cargada dinámicamente -->
             </div>
 
+            <!-- Barra Flotante de Acciones -->
+            <div class="floating-actions-bar absolute-floating">
+              <button class="btn-floating-action atras" id="btn-catalogo-atras" aria-label="Retornar un nivel">
+                <span class="btn-floating-icon">⬅️</span>
+                <span class="btn-floating-text">Atrás</span>
+              </button>
+              <button class="btn-floating-action menu" id="btn-catalogo-menu" aria-label="Volver al menú inicial">
+                <span class="btn-floating-icon">🏠</span>
+                <span class="btn-floating-text">Menú</span>
+              </button>
+              <button class="btn-floating-action asientos" id="btn-catalogo-asientos" aria-label="Ir a la lista de asientos más comunes">
+                <span class="btn-floating-icon">📋</span>
+                <span class="btn-floating-text">Asientos</span>
+              </button>
+            </div>
+
+
+
             <!-- Bottom Sheet para Detalles de la Cuenta -->
             <div class="modal-backdrop" id="modal-backdrop"></div>
             <div class="bottom-sheet" id="pcge-bottom-sheet" role="dialog" aria-labelledby="bs-title">
@@ -395,6 +413,22 @@
         <!-- Libro Diario Apilado (Ledger) -->
         <div class="ledger-view" id="ledger-view">
           <!-- Asientos de naturaleza/destino generados por JS -->
+        </div>
+
+        <!-- Barra Flotante de Acciones -->
+        <div class="floating-actions-bar">
+          <button class="btn-floating-action regresar" id="btn-asiento-regresar" aria-label="Regresar al listado de asientos">
+            <span class="btn-floating-icon">⬅️</span>
+            <span class="btn-floating-text">Regresar</span>
+          </button>
+          <button class="btn-floating-action explicacion" id="btn-asiento-explicacion" aria-label="Ver video explicativo del asiento">
+            <span class="btn-floating-icon">🎥</span>
+            <span class="btn-floating-text">Explicación</span>
+          </button>
+          <button class="btn-floating-action catalogo" id="btn-asiento-catalogo" aria-label="Abrir el catálogo de cuentas">
+            <span class="btn-floating-icon">📖</span>
+            <span class="btn-floating-text">Catálogo</span>
+          </button>
         </div>
       </section>
 

@@ -843,6 +843,68 @@ function setupNavigation() {
       navigateTo("hub");
     }
   });
+
+  // Botones de la barra de acciones en detalle de asiento
+  const btnAsientoRegresar = document.getElementById("btn-asiento-regresar");
+  if (btnAsientoRegresar) {
+    btnAsientoRegresar.addEventListener("click", () => {
+      // Simular click en el botón de regreso para mantener el comportamiento coherente del historial
+      const backBtn = document.getElementById("back-btn");
+      if (backBtn) {
+        backBtn.click();
+      } else {
+        navigateTo("dinamica");
+        showDinamicaPanel("panel-asientos");
+      }
+    });
+  }
+  
+  const btnAsientoCatalogo = document.getElementById("btn-asiento-catalogo");
+  if (btnAsientoCatalogo) {
+    btnAsientoCatalogo.addEventListener("click", () => {
+      // Limpiar historial sacando op-detail para evitar bucles de navegación al regresar
+      if (navigationHistory[navigationHistory.length - 1] === "op-detail") {
+        navigationHistory.pop();
+      }
+      navigateTo("dinamica");
+      showDinamicaPanel("panel-catalogo");
+    });
+  }
+  
+  const btnAsientoExplicacion = document.getElementById("btn-asiento-explicacion");
+  if (btnAsientoExplicacion) {
+    btnAsientoExplicacion.addEventListener("click", () => {
+      showToast("Video explicativo por implementar", "info");
+    });
+  }
+
+  // Botones de la barra de acciones en catálogo de cuentas
+  const btnCatalogoAtras = document.getElementById("btn-catalogo-atras");
+  if (btnCatalogoAtras) {
+    btnCatalogoAtras.addEventListener("click", () => {
+      if (pcgeExplorerCodePath.length > 0) {
+        pcgeExplorerCodePath.pop();
+        const parentCode = pcgeExplorerCodePath[pcgeExplorerCodePath.length - 1] || "";
+        explorePcgeLevel(parentCode);
+      } else {
+        showDinamicaPanel("panel-dinamica-hub");
+      }
+    });
+  }
+
+  const btnCatalogoMenu = document.getElementById("btn-catalogo-menu");
+  if (btnCatalogoMenu) {
+    btnCatalogoMenu.addEventListener("click", () => {
+      showDinamicaPanel("panel-dinamica-hub");
+    });
+  }
+
+  const btnCatalogoAsientos = document.getElementById("btn-catalogo-asientos");
+  if (btnCatalogoAsientos) {
+    btnCatalogoAsientos.addEventListener("click", () => {
+      showDinamicaPanel("panel-asientos");
+    });
+  }
 }
 
 // Notificaciones flotantes tipo Toast
@@ -2175,6 +2237,14 @@ function showBottomSheet(acc) {
           
           commentEdit.style.display = "none";
           commentView.style.display = "flex";
+          
+          btnSave.disabled = false;
+          btnSave.textContent = "Guardar";
+          
+          // Cerrar el modal automáticamente tras un breve lapso
+          setTimeout(() => {
+            hideBottomSheet();
+          }, 800);
         } else {
           showToast("Error al guardar en base de datos", "error");
           btnSave.disabled = false;
