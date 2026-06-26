@@ -24,7 +24,9 @@ const defaultDescriptions = {
   "12": "CUENTAS POR COBRAR COMERCIALES – TERCEROS",
   "121": "Facturas, boletas y otros comprobantes por cobrar",
   "1212": "Emitidas en cartera",
+  "14": "CUENTAS POR COBRAR A PERSONAL, A ACCIONISTAS Y DIRECTORES",
   "1673": "IGV por acreditar en compras",
+  "182": "Seguros",
   "19": "ESTIMACIÓN DE CUENTAS DE COBRANZA DUDOSA",
   "1911": "Facturas, boletas y otros comprobantes por cobrar",
   "20": "MERCADERÍAS",
@@ -46,6 +48,7 @@ const defaultDescriptions = {
   "40": "TRIBUTOS, CONTRAPRESTACIONES Y APORTES AL SISTEMA DE PENSIONES Y DE SALUD POR PAGAR",
   "40xx": "TRIBUTOS POR PAGAR (Por definir)",
   "40111": "IGV - Cuenta propia",
+  "40173": "Renta de quinta categoría",
   "4031": "ESSALUD",
   "4032": "ONP",
   "41": "REMUNERACIONES Y PARTICIPACIONES POR PAGAR",
@@ -71,6 +74,7 @@ const defaultDescriptions = {
   "62": "GASTOS DE PERSONAL Y DIRECTORES",
   "6211": "Sueldos y salarios",
   "6271": "Régimen de prestaciones de salud (ESSALUD)",
+  "6274": "Seguro de vida",
   "63": "GASTOS DE SERVICIOS PRESTADOS POR TERCEROS",
   "6361": "Energía eléctrica",
   "65": "OTROS GASTOS DE GESTIÓN",
@@ -415,30 +419,35 @@ const operations = [
         title: "16.1. Ingresos y descuentos (Planilla)",
         entries: [
           { code: "6211", type: "debe", value: "Rem Bruta" },
-          { code: "4031", type: "haber", value: "ONP" },
+          { code: "62XX", type: "debe", value: "Otras ..." },
+          { code: "4032", type: "haber", value: "ONP" },
+          { code: "40173", type: "haber", value: "Renta 5ta cat" },
           { code: "4111", type: "haber", value: "Rem Neta" },
-          { code: "417", type: "haber", value: "AFP" }
+          { code: "417", type: "haber", value: "AFP" },
+          { code: "14XX / XXX", type: "haber", value: "Otros ..." }
         ]
       },
       {
         title: "16.1. Ingresos y descuentos (Destino)",
         entries: [
-          { code: "9XX", type: "debe", value: "Rem Bruta" },
-          { code: "791", type: "haber", value: "Rem Bruta" }
+          { code: "9XX", type: "debe", value: "RB + Otras" },
+          { code: "791", type: "haber", value: "RB + Otras" }
         ]
       },
       {
         title: "16.2. Aportes del Empleador (Aportes)",
         entries: [
-          { code: "627X", type: "debe", value: "Aporte" },
-          { code: "403X/4212", type: "haber", value: "Aporte" }
+          { code: "6271", type: "debe", value: "ESSALUD" },
+          { code: "6274", type: "debe", value: "Seguro Vida" },
+          { code: "4031", type: "haber", value: "ESSALUD" },
+          { code: "182", type: "haber", value: "Seguro Vida" }
         ]
       },
       {
         title: "16.2. Aportes del Empleador (Destino)",
         entries: [
-          { code: "9XX", type: "debe", value: "Aporte" },
-          { code: "791", type: "haber", value: "Aporte" }
+          { code: "9XX", type: "debe", value: "ESSALUD + Seguro" },
+          { code: "791", type: "haber", value: "ESSALUD + Seguro" }
         ]
       },
       {
@@ -1765,8 +1774,19 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
   const blockDiv = document.createElement("div");
   blockDiv.className = "ledger-block";
   
+  // Limpiar y dar formato al título
+  let displayTitle = block.title || "";
+  let showTitle = true;
+  
+  if (displayTitle.includes("(Destino)")) {
+    showTitle = false;
+  } else {
+    // Quitar sufijos entre paréntesis redundantes como (Planilla), (Aportes), (Beneficios), (Naturaleza), (Provisión), (Gasto)
+    displayTitle = displayTitle.replace(/\s*\([^)]*\)$/, "").trim();
+  }
+  
   blockDiv.innerHTML = `
-    <h4 class="ledger-block-title">${block.title}</h4>
+    ${showTitle && displayTitle ? `<h4 class="ledger-block-title">${displayTitle}</h4>` : ""}
     <div class="ledger-table-wrapper">
       <table class="ledger-table">
         <thead>
@@ -1793,8 +1813,10 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
     let cellClass = "val-xxxx";
     const opId = op ? Number(op.id) : 0;
     
-    if (displayAmount === "Valor venta" || displayAmount === "Valor venta/n" || displayAmount === "Rem Bruta" || displayAmount === "Aporte" || displayAmount === "Beneficio") {
+    if (displayAmount === "Valor venta" || displayAmount === "Valor venta/n" || displayAmount === "Aporte" || displayAmount === "Beneficio" || displayAmount === "ESSALUD" || displayAmount === "Seguro Vida" || displayAmount === "Renta 5ta cat" || (displayAmount === "RB + Otras" && type === "haber") || (displayAmount === "ESSALUD + Seguro" && type === "haber")) {
       cellClass = "val-venta";
+    } else if (displayAmount === "ESSALUD + Seguro" && type === "debe") {
+      cellClass = "val-xxxx-debe";
     } else if (displayAmount === "IGV") {
       cellClass = "val-igv";
     } else if (displayAmount === "Importe Total" || displayAmount === "Rem Neta") {
@@ -1803,7 +1825,7 @@ async function renderLedgerBlock(block, container, blockIdx = 0, op = null) {
       cellClass = type === "debe" ? "val-xxxx-debe" : "val-xxxx-haber";
     } else if (displayAmount === "AFP") {
       cellClass = "val-xxxx-debe";
-    } else if (displayAmount === "ONP" || displayAmount === "IR 5ta categoría" || displayAmount === "Costo Adquisición" || displayAmount === "Tributo") {
+    } else if (displayAmount === "ONP" || displayAmount === "Otros ..." || displayAmount === "IR 5ta categoría" || displayAmount === "Costo Adquisición" || displayAmount === "Tributo") {
       cellClass = "val-xxxx-haber";
     } else if (displayAmount === "XXXX") {
       if (opId === 8 || opId === 9 || opId === 10 || opId === 11 || opId === 13) {
