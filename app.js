@@ -2628,22 +2628,22 @@ function initWeekQuizzes() {
 
 // Base de datos de calificaciones de Pensamiento Lógico (transcrita de los registros de Excel)
 const studentGradesData = [
-  { dni: "71336870", name: "POLLETHE LUCIA", lastname: "ARENAS KALINOWSKI", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
-  { dni: "79543944", name: "ESTEBAN JOSUE", lastname: "COPAJA AQUINO", team: "2", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 } },
-  { dni: "75971521", name: "GIAN FRANCO", lastname: "GOMEZ MAYTA", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
-  { dni: "60967749", name: "NOEMI IDALIA", lastname: "GOMEZ PUMA", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 } },
-  { dni: "72613030", name: "MARIA JULIA", lastname: "HUISACAYNA COLQUE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 } },
-  { dni: "61598208", name: "JIMMY NANDOR", lastname: "JUSTO QUISPE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
-  { dni: "76075806", name: "ELY ROCÍO", lastname: "MARTINEZ CCORPUNA", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
-  { dni: "72086042", name: "KATTY DAYANA", lastname: "MIRANDA SUAQUITA", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 } },
-  { dni: "60732185", name: "JORGE DAVID", lastname: "MOLINA ALVARADO", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:10 } },
-  { dni: "62351533", name: "SEBASTIAN ERNESTO", lastname: "ORCONI GUTIERREZ", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
-  { dni: "60058856", name: "FRANCO LARRY", lastname: "QUISPE LINARES", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
-  { dni: "61366491", name: "NAHOMI SELENE", lastname: "ROMAN QUISPE", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
-  { dni: "61236333", name: "ROCIO XIMENA", lastname: "SALDIVAR TORRES", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 } },
-  { dni: "61324266", name: "FABRICIO ANDERSON", lastname: "SALLUCA SUERO", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
-  { dni: "61413843", name: "MIJAHIL FRANCESCO", lastname: "VEGA HUAMAN", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:17 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 } },
-  { dni: "60044657", name: "CINTYA MEILY", lastname: "YRUPAYLLA QUISPE", team: "??", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } }
+  { dni: "71336870", name: "POLLETHE LUCIA", lastname: "ARENAS KALINOWSKI", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "79543944", name: "ESTEBAN JOSUE", lastname: "COPAJA AQUINO", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:3, r5_1:1, informe:16, r1_2:1, r2_2:2, r3_2:7, r4_2:5, exposicion:15, promedio:15.5 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "75971521", name: "GIAN FRANCO", lastname: "GOMEZ MAYTA", team: "1", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa3: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "60967749", name: "NOEMI IDALIA", lastname: "GOMEZ PUMA", team: "3", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 }, aa3: { r1_1:3, r2_1:3, r3_1:4, r4_1:4, r5_1:4, informe:18, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:17.5 } },
+  { dni: "72613030", name: "MARIA JULIA", lastname: "HUISACAYNA COLQUE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:1, r2_2:2, r3_2:6, r4_2:3, exposicion:12, promedio:16 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "61598208", name: "JIMMY NANDOR", lastname: "JUSTO QUISPE", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "76075806", name: "ELY ROCÍO", lastname: "MARTINEZ CCORPUNA", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:10, r4_2:5, exposicion:19, promedio:19.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "72086042", name: "KATTY DAYANA", lastname: "MIRANDA SUAQUITA", team: "1", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:18.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "60732185", name: "JORGE DAVID", lastname: "MOLINA ALVARADO", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:10, r4_2:3, exposicion:16, promedio:17.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "62351533", name: "SEBASTIAN ERNESTO", lastname: "ORCONI GUTIERREZ", team: "NO", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa3: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "60058856", name: "FRANCO LARRY", lastname: "QUISPE LINARES", team: "3", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 }, aa2: { r1_1:4, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:5, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:3 }, aa3: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:1 } },
+  { dni: "61366491", name: "NAHOMI SELENE", lastname: "ROMAN QUISPE", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:3, informe:19, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "61236333", name: "ROCIO XIMENA", lastname: "SALDIVAR TORRES", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:2, r2_2:2, r3_2:10, r4_2:5, exposicion:19, promedio:19.5 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 } },
+  { dni: "61324266", name: "FABRICIO ANDERSON", lastname: "SALLUCA SUERO", team: "3", aa1: { r1_1:0, r2_1:0, r3_1:0, r4_1:0, r5_1:1, informe:1, r1_2:0, r2_2:0, r3_2:0, r4_2:4, exposicion:4, promedio:2.5 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:3, r5_1:1, informe:16, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:15 }, aa3: { r1_1:2, r2_1:2, r3_1:2, r4_1:4, r5_1:4, informe:14, r1_2:3, r2_2:2, r3_2:6, r4_2:3, exposicion:14, promedio:14 } },
+  { dni: "61413843", name: "MIJAHIL FRANCESCO", lastname: "VEGA HUAMAN", team: "2", aa1: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:10, r4_2:5, exposicion:20, promedio:20 }, aa2: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:2, informe:18, r1_2:1, r2_2:2, r3_2:7, r4_2:4, exposicion:14, promedio:16 }, aa3: { r1_1:4, r2_1:4, r3_1:4, r4_1:4, r5_1:4, informe:20, r1_2:3, r2_2:2, r3_2:9, r4_2:5, exposicion:19, promedio:19.5 } },
+  { dni: "60044657", name: "CINTYA MEILY", lastname: "YRUPAYLLA QUISPE", team: "3", aa1: { r1_1:4, r2_1:3, r3_1:3, r4_1:3, r5_1:3, informe:16, r1_2:0, r2_2:0, r3_2:0, r4_2:1, exposicion:1, promedio:8.5 }, aa2: { r1_1:4, r2_1:3, r3_1:3, r4_1:3, r5_1:3, informe:16, r1_2:1, r2_2:2, r3_2:8, r4_2:4, exposicion:15, promedio:15.5 }, aa3: { r1_1:3, r2_1:3, r3_1:4, r4_1:4, r5_1:4, informe:18, r1_2:2, r2_2:2, r3_2:8, r4_2:5, exposicion:17, promedio:17.5 } }
 ];
 
 // Inicializa el Módulo de Consulta de Calificaciones por DNI
@@ -2775,13 +2775,33 @@ function initGradeLookupModule() {
     document.getElementById("r32_2-val").textContent = student.aa2.r3_2 || "0";
     document.getElementById("r42_2-val").textContent = student.aa2.r4_2 || "0";
     
-    // AA3 (Por calificar)
+    // AA3
+    const promAA3 = student.aa3.promedio;
     const aa3Badge = document.getElementById("promedio-aa3-badge");
-    aa3Badge.textContent = "Pnd.";
-    aa3Badge.style.background = "var(--border)";
-    aa3Badge.style.color = "var(--text-muted)";
-    document.getElementById("promedio-aa3-val").textContent = "Por calificar";
-    document.getElementById("promedio-aa3-val").style.color = "var(--text-muted)";
+    aa3Badge.textContent = `Prm: ${promAA3}`;
+    if (promAA3 >= 13) {
+      aa3Badge.style.background = "var(--debe-light)";
+      aa3Badge.style.color = "var(--debe)";
+    } else {
+      aa3Badge.style.background = "var(--haber-light)";
+      aa3Badge.style.color = "var(--haber)";
+    }
+    
+    document.getElementById("promedio-aa3-val").textContent = promAA3;
+    document.getElementById("promedio-aa3-val").style.color = promAA3 >= 13 ? "var(--debe)" : "var(--haber)";
+    
+    document.getElementById("informe-aa3-val").textContent = student.aa3.informe;
+    document.getElementById("r11_3-val").textContent = student.aa3.r1_1 || "0";
+    document.getElementById("r21_3-val").textContent = student.aa3.r2_1 || "0";
+    document.getElementById("r31_3-val").textContent = student.aa3.r3_1 || "0";
+    document.getElementById("r41_3-val").textContent = student.aa3.r4_1 || "0";
+    document.getElementById("r52_3-val").textContent = student.aa3.r5_1 || "0";
+    
+    document.getElementById("exposicion-aa3-val").textContent = student.aa3.exposicion;
+    document.getElementById("r12_3-val").textContent = student.aa3.r1_2 || "0";
+    document.getElementById("r22_3-val").textContent = student.aa3.r2_2 || "0";
+    document.getElementById("r32_3-val").textContent = student.aa3.r3_2 || "0";
+    document.getElementById("r42_3-val").textContent = student.aa3.r4_2 || "0";
     
     // E4 (Por calificar)
     const e4Badge = document.getElementById("promedio-e4-badge");
@@ -2812,6 +2832,7 @@ function initGradeLookupModule() {
         <td style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted);">${student.dni}</td>
         <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 700;">${student.aa1.promedio}</td>
         <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 700;">${student.aa2.promedio}</td>
+        <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 700;">${student.aa3.promedio}</td>
         <td style="padding: 0.5rem 0.4rem; text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.65rem;">Por calificar</td>
         <td style="padding: 0.5rem 0.4rem; text-align: center;">
           <button class="btn-primary btn-inspect-student" data-dni="${student.dni}" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">Ver</button>
